@@ -1,0 +1,1781 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="theme-color" content="#1a0e00">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>⛏️ Шахта 2026</title>
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root {
+  --amber-1: #ff9b3d; --amber-2: #ff7a1a; --amber-3: #c74a00;
+  --bg-warm-1: #2a1206; --bg-warm-2: #14060a;
+  --gold-1: #ffd166; --gold-2: #ffc93c; --gold-3: #ff7a00;
+  --purple-1: #a66bff; --purple-2: #7a3fff; --purple-3: #5b2a99;
+  --mint-1: #00f5a0; --mint-2: #00d9ff;
+  --red-1: #ff4d4d; --red-2: #c92a2a;
+  --text-1: #faf6ff; --text-2: #b8a9d9; --text-3: #6b5c8a;
+  --glass: rgba(255,255,255,0.06); --glass-border: rgba(255,255,255,0.1);
+  --safe-top: env(safe-area-inset-top, 0px); --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+html, body { height: 100%; overflow: hidden; overscroll-behavior: none; touch-action: manipulation; }
+body {
+  font-family: 'Inter', -apple-system, system-ui, sans-serif;
+  color: var(--text-1); background: var(--bg-warm-1);
+  display: flex; justify-content: center;
+  user-select: none; -webkit-user-select: none;
+}
+#particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.dust { position: absolute; width: 3px; height: 3px; background: radial-gradient(circle, var(--gold-2) 0%, transparent 70%); border-radius: 50%; opacity: 0; animation: float-up linear infinite; }
+@keyframes float-up { 0% { transform: translateY(0); opacity: 0; } 10% { opacity: 0.7; } 90% { opacity: 0.2; } 100% { transform: translateY(-110vh) translateX(30px); opacity: 0; } }
+.screen-main {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,155,61,0.25), transparent 60%), radial-gradient(ellipse 100% 80% at 50% 100%, rgba(199,74,0,0.2), transparent 70%), linear-gradient(180deg, #2a1206 0%, #1a0800 40%, #0d0402 100%);
+  display: flex; flex-direction: column; overflow: hidden; transition: opacity 0.4s, transform 0.4s;
+}
+.screen-main.hidden { opacity: 0; transform: scale(1.1); pointer-events: none; }
+.screen-main::before {
+  content: ''; position: absolute; inset: 0;
+  background-image: radial-gradient(circle at 20% 30%, rgba(255,155,61,0.08) 2px, transparent 3px), radial-gradient(circle at 80% 70%, rgba(255,155,61,0.06) 1.5px, transparent 2.5px), radial-gradient(circle at 50% 50%, rgba(255,155,61,0.05) 1px, transparent 2px);
+  background-size: 240px 240px; pointer-events: none; opacity: 0.6;
+}
+.top-icons { position: absolute; top: calc(12px + var(--safe-top)); left: 12px; display: flex; gap: 8px; z-index: 10; }
+.icon-btn {
+  width: 44px; height: 44px;
+  background: rgba(20,10,5,0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(255,155,61,0.25); border-radius: 50%; color: #ffd166;
+  font-size: 18px; cursor: pointer; transition: all 0.25s;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+.icon-btn:hover, .icon-btn:active { transform: translateY(-2px) scale(1.05); border-color: rgba(255,193,60,0.7); background: rgba(40,20,5,0.85); }
+.top-right { position: absolute; top: calc(12px + var(--safe-top)); right: 12px; display: flex; flex-direction: column; gap: 8px; z-index: 10; }
+.info-card {
+  background: linear-gradient(135deg, rgba(255,193,60,0.15), rgba(255,122,0,0.15));
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(255,193,60,0.35); border-radius: 14px;
+  padding: 8px 14px; display: flex; align-items: center; gap: 8px;
+  min-width: 120px; justify-content: space-between;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+.info-card .info-label { font-size: 16px; filter: drop-shadow(0 0 8px rgba(255,193,60,0.6)); }
+.info-card .info-value { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 15px; color: var(--gold-1); text-shadow: 0 0 12px rgba(255,193,60,0.6); }
+.currencies-panel {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  height: 66.66%; max-height: 66.66%; width: 110px;
+  background: rgba(20,10,5,0.6); backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(255,155,61,0.2); border-radius: 20px;
+  padding: 12px 8px; display: flex; flex-direction: column; gap: 8px;
+  overflow-y: auto; z-index: 10;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  scrollbar-width: thin;
+}
+.currencies-panel::-webkit-scrollbar { width: 4px; }
+.currencies-panel::-webkit-scrollbar-thumb { background: rgba(255,193,60,0.3); border-radius: 2px; }
+.currency-item {
+  background: rgba(255,255,255,0.04); border: 1.5px solid rgba(255,255,255,0.08);
+  border-radius: 12px; padding: 8px 6px; text-align: center;
+  position: relative; transition: all 0.3s; flex-shrink: 0;
+}
+.currency-item.unlocked { border-color: var(--curr-color, #ffc93c); box-shadow: 0 0 20px -5px var(--curr-color, #ffc93c); }
+.currency-item.locked { opacity: 0.3; filter: grayscale(0.9); }
+.currency-icon { font-size: 22px; line-height: 1; margin-bottom: 3px; filter: drop-shadow(0 0 6px var(--curr-color, #ffc93c)); }
+.currency-item.locked .currency-icon { filter: blur(2px) grayscale(1); }
+.currency-name { font-size: 9px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 2px; }
+.currency-count { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 800; color: var(--curr-color, #ffc93c); }
+.currency-item.locked .currency-count { color: var(--text-3); }
+.currency-lock { position: absolute; top: 3px; right: 3px; font-size: 10px; opacity: 0.7; }
+.center-stack {
+  position: absolute; left: 50%; bottom: 20%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+  z-index: 5; width: min(480px, calc(100% - 280px));
+}
+.start-btn {
+  width: 100%; padding: 24px 30px;
+  font-family: 'Inter', sans-serif; font-size: clamp(18px, 3vw, 24px);
+  font-weight: 900; letter-spacing: 1px; text-transform: uppercase;
+  background: linear-gradient(135deg, #fff8e7 0%, #ffd166 40%, #ff9b3d 100%);
+  border: none; border-radius: 24px; color: #2a1206; cursor: pointer;
+  position: relative; overflow: hidden;
+  box-shadow: 0 20px 50px rgba(255,122,0,0.5), inset 0 2px 0 rgba(255,255,255,0.7), inset 0 -6px 0 rgba(180,80,0,0.3);
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+}
+.start-btn:hover { transform: translateY(-4px) scale(1.02); }
+.start-btn:active { transform: scale(0.98); }
+.start-btn .icon { font-size: 28px; }
+.branch-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
+.branch-btn {
+  padding: 18px 16px; border-radius: 20px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  color: #fff; border: none; overflow: hidden; font-family: 'Inter', sans-serif;
+}
+.branch-btn.skills { background: linear-gradient(135deg, var(--purple-1), var(--purple-3)); box-shadow: 0 12px 36px rgba(122,63,255,0.4); }
+.branch-btn.prestige { background: linear-gradient(135deg, #8a5fff, #3a1a80); box-shadow: 0 12px 36px rgba(90,42,153,0.4); }
+.branch-btn:hover, .branch-btn:active { transform: translateY(-3px) scale(1.02); }
+.branch-icon { font-size: 26px; }
+.branch-label { font-size: 13px; font-weight: 800; text-transform: uppercase; }
+.branch-sub { font-size: 10px; font-family: 'JetBrains Mono', monospace; font-weight: 700; color: rgba(255,255,255,0.8); }
+.rebirth-btn {
+  width: 100%; padding: 18px; border-radius: 20px;
+  background: linear-gradient(135deg, var(--amber-1), var(--amber-3));
+  border: none; color: #fff;
+  font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 900;
+  text-transform: uppercase; cursor: pointer;
+  box-shadow: 0 12px 36px rgba(255,122,26,0.5);
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.rebirth-btn:hover, .rebirth-btn:active { transform: translateY(-3px) scale(1.01); }
+.rebirth-btn.ready { animation: rebirth-glow 2s infinite; }
+@keyframes rebirth-glow { 0%, 100% { box-shadow: 0 12px 36px rgba(255,122,26,0.5), 0 0 40px rgba(255,193,60,0.4); } 50% { box-shadow: 0 12px 36px rgba(255,122,26,0.8), 0 0 70px rgba(255,193,60,0.7); } }
+.rebirth-btn .icon { font-size: 22px; }
+.logs-btn {
+  position: absolute; bottom: calc(16px + var(--safe-bottom)); left: 12px;
+  padding: 10px 16px;
+  background: rgba(20,10,5,0.7); backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(255,155,61,0.25); border-radius: 12px;
+  color: var(--gold-1); font-size: 12px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; gap: 6px; z-index: 10;
+}
+.screen-run {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 100% 60% at 50% 0%, rgba(122,63,255,0.2), transparent 60%), linear-gradient(180deg, #0f0a25 0%, #0a0620 40%, #05030f 100%);
+  display: none; flex-direction: column; opacity: 0; transition: opacity 0.3s;
+}
+.screen-run.active { display: flex; opacity: 1; }
+.run-hud {
+  position: absolute; top: calc(12px + var(--safe-top)); left: 12px; right: 12px;
+  display: flex; gap: 10px; z-index: 10; flex-wrap: wrap;
+}
+.hud-tile {
+  background: rgba(5,3,15,0.75); backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(122,63,255,0.4); border-radius: 14px;
+  padding: 10px 16px; display: flex; flex-direction: column; gap: 2px;
+  min-width: 100px; box-shadow: 0 6px 24px rgba(0,0,0,0.4);
+}
+.hud-tile .hud-label { font-size: 9px; color: var(--text-3); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+.hud-tile .hud-value { font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 800; color: var(--gold-1); }
+.hud-tile.timer .hud-value { color: var(--mint-1); }
+.hud-tile.timer.urgent .hud-value { color: #ff5a5a; animation: urgent-pulse 0.5s infinite; }
+@keyframes urgent-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+.hud-tile.combo .hud-value { color: #ff7a1a; }
+.hud-tile.combo.hot .hud-value { animation: combo-pulse 0.6s infinite; }
+@keyframes combo-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); color: #ffd166; } }
+.run-field { position: absolute; inset: 0; overflow: hidden; touch-action: manipulation; }
+.ore-node {
+  position: absolute; border-radius: 50%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent;
+  transition: transform 0.15s; animation: ore-spawn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 2; touch-action: manipulation;
+}
+.ore-node::before { content: ''; position: absolute; inset: -12px; border-radius: 50%; background: radial-gradient(circle, var(--ore-color, #ffc93c) 0%, transparent 65%); opacity: 0.5; z-index: -1; animation: ore-pulse 1.2s ease-in-out infinite; pointer-events: none; }
+.ore-image {
+  width: 75%;
+  height: 75%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.ore-node.boss .ore-image {
+  width: 85%;
+  height: 85%;
+  filter: drop-shadow(0 0 16px currentColor);
+}
+.ore-icon { font-size: clamp(20px, 4.5vw, 32px); line-height: 1; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5)); pointer-events: none; }
+.hp-bar { width: 60%; min-width: 30px; max-width: 56px; height: 4px; background: rgba(0,0,0,0.65); border-radius: 2px; margin-top: 3px; overflow: hidden; pointer-events: none; }
+.hp-fill { height: 100%; background: linear-gradient(90deg, var(--mint-1), var(--mint-2)); border-radius: 2px; transition: width 0.15s; }
+.hp-fill.low { background: linear-gradient(90deg, #ff5a5a, #ff3dae); }
+.hp-text { position: absolute; bottom: -14px; font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; color: var(--ore-color, #ffc93c); white-space: nowrap; pointer-events: none; }
+.ore-node:hover { transform: scale(1.1); }
+.ore-node:active { transform: scale(0.92); }
+.ore-node.hit { animation: ore-hit 0.15s; }
+@keyframes ore-hit { 0%, 100% { transform: scale(1); } 50% { transform: scale(0.85) rotate(-3deg); } }
+.ore-node.collected { animation: ore-collect 0.45s ease-out forwards; pointer-events: none; }
+@keyframes ore-spawn { from { transform: scale(0) rotate(-180deg); opacity: 0; } to { transform: scale(1) rotate(0deg); opacity: 1; } }
+@keyframes ore-collect { 0% { transform: scale(1) rotate(0); opacity: 1; } 50% { transform: scale(1.5) rotate(20deg); opacity: 0.9; } 100% { transform: scale(0) rotate(90deg); opacity: 0; } }
+@keyframes ore-pulse { 0%, 100% { opacity: 0.35; transform: scale(1); } 50% { opacity: 0.75; transform: scale(1.2); } }
+.ore-node.moving { transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1), top 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+.ore-node.zigzag { animation: ore-spawn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), zigzag-move 1.5s infinite; }
+@keyframes zigzag-move { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(15px); } }
+.ore-node.dodging { transition: left 0.3s ease-out, top 0.3s ease-out; }
+.ore-node.boss { z-index: 5; }
+.ore-node.boss::before { inset: -20px; opacity: 0.8; animation: ore-pulse 0.8s ease-in-out infinite; }
+.ore-node.boss .ore-icon { font-size: clamp(40px, 9vw, 70px); }
+.ore-node.boss .hp-bar { width: 90%; min-width: 60px; max-width: 100px; height: 6px; }
+.boss-crown { position: absolute; top: -22px; font-size: 22px; filter: drop-shadow(0 0 10px rgba(255,193,60,0.9)); animation: crown-bounce 1s infinite; pointer-events: none; }
+@keyframes crown-bounce { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-4px) scale(1.1); } }
+.end-btn {
+  position: absolute; bottom: calc(16px + var(--safe-bottom)); left: 50%; transform: translateX(-50%);
+  padding: 16px 40px;
+  background: linear-gradient(135deg, #ff4d4d, #a01818);
+  border: none; border-radius: 18px; color: #fff;
+  font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 900;
+  letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
+  transition: all 0.25s;
+  box-shadow: 0 12px 36px rgba(200,30,30,0.5);
+  display: flex; align-items: center; gap: 10px; z-index: 20;
+  min-width: 220px; justify-content: center;
+}
+.end-btn:hover, .end-btn:active { transform: translateX(-50%) translateY(-3px) scale(1.02); }
+.end-btn:active { transform: translateX(-50%) translateY(-1px) scale(0.98); }
+.run-progress { position: absolute; bottom: 0; left: 0; right: 0; height: 5px; background: rgba(0,0,0,0.5); z-index: 15; }
+.run-progress-fill { height: 100%; background: linear-gradient(90deg, var(--mint-1), var(--gold-2)); transition: width 0.1s linear; }
+.run-progress-fill.urgent { background: linear-gradient(90deg, #ff7a00, #ff3dae); }
+.run-result {
+  position: absolute; inset: 0;
+  background: rgba(5,3,15,0.92); backdrop-filter: blur(14px);
+  display: none; flex-direction: column; align-items: center; justify-content: center;
+  gap: 20px; padding: 24px; z-index: 30; text-align: center;
+}
+.run-result.active { display: flex; animation: fade-in 0.4s; }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+.result-title { font-size: clamp(22px, 4vw, 32px); font-weight: 900; background: linear-gradient(135deg, var(--gold-1), var(--gold-3)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; width: 100%; max-width: 560px; }
+.result-card { background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: 14px; padding: 14px 10px; }
+.result-card-label { font-size: 9px; color: var(--text-3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; font-weight: 700; }
+.result-card-value { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 800; color: var(--gold-1); }
+.result-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.result-btn { padding: 14px 28px; border-radius: 14px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; border: none; transition: all 0.2s; }
+.result-btn.again { background: linear-gradient(135deg, var(--gold-1), var(--gold-3)); color: #1a0e00; box-shadow: 0 10px 30px rgba(255,122,0,0.4); }
+.result-btn.menu { background: rgba(255,255,255,0.08); color: var(--text-1); border: 1px solid var(--glass-border); }
+.result-btn:hover, .result-btn:active { transform: translateY(-2px) scale(1.02); }
+.fullscreen-screen {
+  position: fixed; inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(122,63,255,0.2), transparent 60%), linear-gradient(180deg, #1a0e40 0%, #0f0625 40%, #05020f 100%);
+  z-index: 100; display: none; flex-direction: column; opacity: 0; transition: opacity 0.3s;
+}
+.fullscreen-screen.active { display: flex; opacity: 1; }
+.fs-header { padding: calc(16px + var(--safe-top)) 20px 16px; display: flex; align-items: center; gap: 14px; border-bottom: 1px solid rgba(255,255,255,0.06); flex-shrink: 0; }
+.fs-back { width: 44px; height: 44px; background: rgba(255,255,255,0.06); border: 1.5px solid var(--glass-border); border-radius: 50%; color: var(--text-1); font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
+.fs-back:hover, .fs-back:active { background: rgba(255,255,255,0.12); transform: scale(1.08); }
+.fs-title { font-size: clamp(18px, 3vw, 24px); font-weight: 900; flex: 1; }
+.skills-title { background: linear-gradient(135deg, var(--purple-1), #e24bff); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.tree-title { background: linear-gradient(135deg, var(--mint-1), var(--mint-2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.rebirth-title { background: linear-gradient(135deg, var(--gold-1), var(--gold-3)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.fs-body { flex: 1; overflow: auto; padding: 20px; position: relative; -webkit-overflow-scrolling: touch; }
+.tree-wrap { position: relative; margin: 0 auto; }
+.tree-svg { position: absolute; top: 0; left: 0; pointer-events: none; }
+.tree-canvas { position: relative; }
+.tnode { position: absolute; width: 140px; padding: 10px; background: rgba(30,15,60,0.7); backdrop-filter: blur(10px); border: 2px solid var(--glass-border); border-radius: 14px; cursor: pointer; transition: all 0.25s; text-align: center; font-size: 11px; user-select: none; z-index: 2; }
+.tnode:hover:not(.locked):not(.maxed):not(.mystery) { transform: translateY(-3px) scale(1.03); border-color: var(--node-accent, #a66bff); box-shadow: 0 12px 30px rgba(0,0,0,0.5), 0 0 25px var(--node-glow, rgba(166,107,255,0.5)); }
+.tnode.maxed { background: linear-gradient(135deg, rgba(166,107,255,0.25), rgba(122,63,255,0.25)); border-color: rgba(166,107,255,0.7); cursor: default; }
+.tnode.locked { opacity: 0.4; cursor: not-allowed; }
+.tnode.mystery { background: rgba(40,25,80,0.4); border-color: rgba(100,80,160,0.35); border-style: dashed; cursor: default; opacity: 0.9; }
+.tnode.mystery .tnode-icon { filter: blur(1.5px); opacity: 0.8; }
+.tnode-icon { font-size: 24px; margin-bottom: 4px; line-height: 1; }
+.tnode-name { font-weight: 800; margin-bottom: 3px; font-size: 11px; line-height: 1.2; }
+.tnode-level { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--node-accent, #ffd166); margin-bottom: 3px; font-weight: 700; }
+.tnode-desc { font-size: 9px; color: var(--text-2); line-height: 1.3; margin-bottom: 5px; min-height: 22px; }
+.tnode-cost { font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 11px; color: var(--gold-1); padding: 3px 8px; background: rgba(255,193,60,0.12); border: 1px solid rgba(255,193,60,0.25); border-radius: 8px; display: inline-block; }
+.tnode.maxed .tnode-cost { color: #1a0e00; background: rgba(255,193,60,0.9); border-color: var(--gold-1); }
+.tnode.hp-ore-node { background: linear-gradient(135deg, rgba(200,40,60,0.15), rgba(100,10,30,0.15)); border-color: rgba(255,90,110,0.5); }
+.tnode.hp-ore-node .tnode-cost { color: #ff9090; background: rgba(255,90,110,0.15); border-color: rgba(255,90,110,0.35); }
+.tnode.hp-ore-node.maxed { background: linear-gradient(135deg, rgba(255,90,110,0.3), rgba(200,30,60,0.3)); border-color: rgba(255,120,140,0.8); }
+.tnode.hp-ore-node.maxed .tnode-cost { color: #fff; background: linear-gradient(135deg, #ff5a6a, #c92a4a); border-color: #ff7a8a; }
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); z-index: 200; display: none; align-items: center; justify-content: center; padding: 16px; opacity: 0; transition: opacity 0.25s; }
+.modal.active { display: flex; opacity: 1; }
+.modal-inner { background: linear-gradient(180deg, rgba(30,15,60,0.98), rgba(15,8,40,0.98)); border: 1.5px solid rgba(166,107,255,0.4); border-radius: 22px; padding: 24px; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; box-shadow: 0 30px 80px rgba(0,0,0,0.8); animation: modal-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+@keyframes modal-in { from { transform: scale(0.9) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+.modal-title { font-size: 22px; font-weight: 900; text-align: center; margin-bottom: 16px; background: linear-gradient(135deg, var(--purple-1), #e24bff); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.modal-info { background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); border-radius: 14px; padding: 14px 16px; margin-bottom: 16px; }
+.modal-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
+.modal-row:last-child { border-bottom: none; }
+.modal-row span:first-child { color: var(--text-2); }
+.modal-row span:last-child { font-family: 'JetBrains Mono', monospace; font-weight: 800; color: var(--gold-1); }
+.modal-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+.modal-actions button { flex: 1; min-width: 120px; padding: 14px; border-radius: 14px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 800; cursor: pointer; border: none; transition: all 0.2s; }
+.btn-cancel { background: rgba(255,255,255,0.06); color: var(--text-1); border: 1px solid var(--glass-border); }
+.btn-cancel:hover { background: rgba(255,255,255,0.12); }
+.btn-primary { background: linear-gradient(135deg, var(--purple-1), var(--purple-2)); color: #fff; box-shadow: 0 8px 24px rgba(122,63,255,0.4); }
+.btn-primary:hover:not(:disabled) { transform: translateY(-2px); }
+.btn-primary:disabled { background: rgba(80,80,100,0.3); color: var(--text-3); cursor: not-allowed; box-shadow: none; }
+.btn-danger { background: linear-gradient(135deg, #c0392b, #e74c3c); color: #fff; }
+.logs-list { max-height: 60vh; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-2); line-height: 1.7; }
+.logs-list .log-line { padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+.logs-list .log-line .log-time { color: var(--text-3); font-size: 10px; margin-right: 8px; }
+.logs-list .log-line:first-child { color: var(--mint-1); font-weight: 700; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px; }
+.stat-box { background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: 12px; padding: 12px; text-align: center; }
+.stat-box-label { font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; font-weight: 700; }
+.stat-box-value { font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 800; color: var(--gold-1); }
+.daily-box { background: linear-gradient(135deg, rgba(255,193,60,0.15), rgba(255,122,0,0.15)); border: 1.5px solid rgba(255,193,60,0.4); border-radius: 14px; padding: 16px; text-align: center; margin-bottom: 16px; }
+.daily-box.ready { animation: daily-pulse 2s infinite; }
+@keyframes daily-pulse { 0%, 100% { box-shadow: 0 0 20px rgba(255,193,60,0.4); } 50% { box-shadow: 0 0 40px rgba(255,193,60,0.8); } }
+.skins-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+.skin-card { background: rgba(255,255,255,0.03); border: 1.5px solid var(--glass-border); border-radius: 14px; padding: 12px; cursor: pointer; transition: all 0.25s; text-align: center; }
+.skin-card:hover:not(.locked) { transform: translateY(-3px); }
+.skin-card.active { border-color: var(--mint-1); box-shadow: 0 0 25px rgba(0,245,160,0.4); }
+.skin-card.locked { opacity: 0.4; cursor: not-allowed; }
+.skin-preview { width: 100%; height: 60px; border-radius: 10px; margin-bottom: 8px; }
+.skin-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+.skin-cost { font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--gold-1); font-weight: 700; }
+.dev-credit { margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+.dev-credit-text { font-size: 12px; color: var(--text-3); letter-spacing: 0.5px; }
+.dev-credit-text b { color: var(--gold-1); font-weight: 800; font-size: 14px; }
+.dev-tg-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: linear-gradient(135deg, #229ED9, #0088cc); border: none; border-radius: 12px; color: #fff; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 800; text-decoration: none; cursor: pointer; box-shadow: 0 8px 24px rgba(34,158,217,0.4); }
+.dev-tg-btn:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 12px 32px rgba(34,158,217,0.6); }
+.dev-tg-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+.toast-container { position: fixed; top: calc(70px + var(--safe-top)); left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; gap: 8px; z-index: 500; pointer-events: none; max-width: calc(100% - 40px); }
+.toast { padding: 12px 22px; border-radius: 14px; font-weight: 800; font-size: 13px; text-align: center; animation: toast-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: none; box-shadow: 0 10px 40px rgba(0,0,0,0.5); backdrop-filter: blur(12px); }
+.toast.gold { background: linear-gradient(135deg, rgba(255,209,102,0.95), rgba(255,122,0,0.95)); color: #1a0e00; }
+.toast.red { background: linear-gradient(135deg, rgba(255,61,174,0.95), rgba(200,30,30,0.95)); color: #fff; }
+.toast.mint { background: linear-gradient(135deg, rgba(0,245,160,0.95), rgba(0,217,255,0.95)); color: #002a1c; }
+.toast.purple { background: linear-gradient(135deg, rgba(166,107,255,0.95), rgba(122,63,255,0.95)); color: #fff; }
+@keyframes toast-in { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.toast.out { animation: toast-out 0.3s forwards; }
+@keyframes toast-out { to { transform: translateY(-30px); opacity: 0; } }
+.click-particle { position: fixed; pointer-events: none; font-family: 'JetBrains Mono', monospace; font-weight: 800; color: var(--gold-1); text-shadow: 0 0 12px rgba(255,193,60,0.9); z-index: 400; font-size: 18px; user-select: none; animation: particle-fly 0.9s cubic-bezier(0.2, 0.8, 0.3, 1) forwards; }
+.click-particle.damage { color: #ff6b6b; font-size: 16px; }
+.click-particle.crit { color: #ffd166; font-size: 24px; text-shadow: 0 0 20px rgba(255,193,60,1), 0 0 40px rgba(255,122,0,0.8); }
+@keyframes particle-fly { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; } 100% { transform: translate(-50%, -180%) scale(1.4); opacity: 0; } }
+.screen-flash { position: fixed; inset: 0; background: radial-gradient(circle at center, rgba(255,193,60,0.4), transparent 60%); pointer-events: none; z-index: 350; animation: flash 0.3s; }
+@keyframes flash { from { opacity: 1; } to { opacity: 0; } }
+@media (max-width: 720px) {
+  .center-stack { width: calc(100% - 180px); left: calc(50% + 50px); bottom: 15%; gap: 10px; }
+  .start-btn { padding: 18px 20px; }
+  .start-btn .icon { font-size: 22px; }
+  .branch-btn { padding: 14px 12px; }
+  .branch-icon { font-size: 20px; }
+  .branch-label { font-size: 11px; }
+  .rebirth-btn { padding: 14px; font-size: 13px; }
+  .rebirth-btn .icon { font-size: 18px; }
+  .currencies-panel { width: 80px; padding: 8px 6px; }
+  .currency-icon { font-size: 18px; }
+  .currency-count { font-size: 11px; }
+  .currency-name { font-size: 8px; }
+  .icon-btn { width: 38px; height: 38px; font-size: 15px; }
+  .info-card { padding: 6px 10px; min-width: 90px; }
+  .info-card .info-value { font-size: 13px; }
+  .logs-btn { font-size: 10px; padding: 8px 12px; }
+  .hud-tile { padding: 8px 12px; min-width: 80px; }
+  .hud-tile .hud-value { font-size: 15px; }
+  .end-btn { padding: 14px 24px; font-size: 13px; min-width: 180px; }
+  .modal-inner { padding: 18px; border-radius: 18px; }
+  .tnode { width: 120px; padding: 8px; }
+  .tnode-icon { font-size: 20px; }
+  .tnode-name { font-size: 10px; }
+  .tnode-desc { font-size: 8px; }
+}
+@media (max-width: 500px) {
+  .info-card { min-width: 80px; padding: 5px 9px; }
+  .info-card .info-value { font-size: 12px; }
+  .currencies-panel { width: 68px; padding: 6px 4px; gap: 6px; }
+  .currency-item { padding: 6px 4px; }
+  .currency-icon { font-size: 16px; }
+  .currency-count { font-size: 10px; }
+  .currency-name { font-size: 7px; }
+  .center-stack { width: calc(100% - 150px); left: calc(50% + 40px); bottom: 12%; }
+  .start-btn { padding: 15px 16px; font-size: 15px; border-radius: 18px; }
+  .branch-row { gap: 8px; }
+  .branch-btn { padding: 10px 8px; border-radius: 14px; }
+  .branch-icon { font-size: 16px; }
+  .branch-label { font-size: 10px; }
+  .branch-sub { font-size: 9px; }
+  .rebirth-btn { padding: 11px; font-size: 11px; border-radius: 14px; }
+  .icon-btn { width: 34px; height: 34px; font-size: 13px; }
+  .logs-btn { padding: 6px 10px; font-size: 9px; }
+  .end-btn { padding: 12px 20px; min-width: 150px; font-size: 12px; }
+  .hud-tile { padding: 6px 10px; min-width: 70px; }
+  .hud-tile .hud-label { font-size: 8px; }
+  .hud-tile .hud-value { font-size: 13px; }
+  .result-card-value { font-size: 16px; }
+  .tnode { width: 100px; padding: 6px; }
+  .tnode-name { font-size: 9px; }
+  .tnode-desc { font-size: 7px; min-height: 18px; }
+  .tnode-cost { font-size: 9px; padding: 2px 5px; }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .center-stack { bottom: 8%; gap: 6px; }
+  .start-btn { padding: 12px 16px; font-size: 14px; }
+  .branch-btn { padding: 8px 10px; }
+  .rebirth-btn { padding: 10px; font-size: 11px; }
+  .currencies-panel { max-height: 70%; height: 70%; }
+}
+</style>
+</head>
+<body>
+
+<!-- SPLASH SCREEN -->
+<div id="splashScreen" style="position: fixed; inset: 0; background: radial-gradient(ellipse at center, #2a1206 0%, #0d0402 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; z-index: 9999; transition: opacity 0.6s ease-out;">
+  <div style="font-size: 120px; filter: drop-shadow(0 0 40px rgba(255,193,60,0.7)); animation: splash-bounce 1.5s ease-in-out infinite;">⛏️</div>
+  <div style="font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; background: linear-gradient(135deg, #ffd166, #ff7a00); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">ШАХТА 2026</div>
+  <div style="font-family: 'Inter', sans-serif; font-size: 13px; color: #b8a9d9; letter-spacing: 1px;">Загрузка...</div>
+  <div style="width: 200px; height: 4px; background: rgba(255,193,60,0.2); border-radius: 2px; overflow: hidden; margin-top: 8px;">
+    <div id="splashProgress" style="width: 0%; height: 100%; background: linear-gradient(90deg, #ffd166, #ff7a00); transition: width 0.3s ease-out; box-shadow: 0 0 12px rgba(255,193,60,0.8);"></div>
+  </div>
+</div>
+
+<style>
+  @keyframes splash-bounce {
+    0%, 100% { transform: translateY(0) rotate(-5deg); }
+    50%      { transform: translateY(-15px) rotate(5deg); }
+  }
+</style>
+
+<div id="particles"></div>
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ГЛАВНЫЙ ЭКРАН -->
+<div class="screen-main" id="screenMain">
+  <div class="top-icons">
+    <button class="icon-btn" id="settingsBtn" title="Настройки">⚙</button>
+    <button class="icon-btn" id="soundBtn" title="Звук">🔊</button>
+    <button class="icon-btn" id="statsBtn" title="Статистика">📊</button>
+    <button class="icon-btn" id="saveBtn" title="Сохранить">💾</button>
+  </div>
+  <div class="top-right">
+    <div class="info-card">
+      <span class="info-label">💰</span>
+      <span class="info-value" id="moneyDisplay">0</span>
+    </div>
+    <div class="info-card">
+      <span class="info-label">🔄</span>
+      <span class="info-value" id="rebirthsDisplay">0</span>
+    </div>
+  </div>
+  <div class="currencies-panel" id="currenciesPanel"></div>
+  <div class="center-stack">
+    <button class="start-btn" id="startBtn">
+      <span class="icon">⛏️</span>
+      <span>НАЧАТЬ ЗАБЕГ</span>
+    </button>
+    <div class="branch-row">
+      <button class="branch-btn skills" id="skillsBtn">
+        <span class="branch-icon">🌲</span>
+        <span class="branch-label">Навыки</span>
+        <span class="branch-sub" id="skillsSub">0 узлов</span>
+      </button>
+      <button class="branch-btn prestige" id="prestigeBtn">
+        <span class="branch-icon">🌳</span>
+        <span class="branch-label">Престиж</span>
+        <span class="branch-sub" id="prestigeSub">0 очков</span>
+      </button>
+    </div>
+    <button class="rebirth-btn" id="rebirthBtn">
+      <span class="icon">🔄</span>
+      <span>РЕБЁРН</span>
+    </button>
+  </div>
+  <button class="logs-btn" id="logsBtn">📜 Логи</button>
+</div>
+
+<!-- ЭКРАН ЗАБЕГА -->
+<div class="screen-run" id="screenRun">
+  <div class="run-hud">
+    <div class="hud-tile timer" id="timerTile">
+      <span class="hud-label">Время</span>
+      <span class="hud-value" id="timerValue">30.0</span>
+    </div>
+    <div class="hud-tile">
+      <span class="hud-label">Деньги</span>
+      <span class="hud-value" id="runMoney">0</span>
+    </div>
+    <div class="hud-tile combo" id="comboTile">
+      <span class="hud-label">Комбо</span>
+      <span class="hud-value" id="comboValue">×0</span>
+    </div>
+  </div>
+  <div class="run-field" id="runField"></div>
+  <button class="end-btn" id="endRunBtn">⏹ ЗАКОНЧИТЬ ЗАБЕГ</button>
+  <div class="run-progress">
+    <div class="run-progress-fill" id="runProgressFill" style="width:100%"></div>
+  </div>
+  <div class="run-result" id="runResult">
+    <div class="result-title" id="resultTitle">🏁 Забег завершён!</div>
+    <div class="result-grid">
+      <div class="result-card"><div class="result-card-label">Собрано</div><div class="result-card-value" id="resultCount">0</div></div>
+      <div class="result-card"><div class="result-card-label">Денег</div><div class="result-card-value" id="resultMoney">0</div></div>
+      <div class="result-card"><div class="result-card-label">Редчайшая</div><div class="result-card-value" id="resultBest">—</div></div>
+      <div class="result-card"><div class="result-card-label">Макс. комбо</div><div class="result-card-value" id="resultCombo">0</div></div>
+    </div>
+    <div class="result-actions">
+      <button class="result-btn again" id="againBtn">⛏️ ЕЩЁ РАЗ</button>
+      <button class="result-btn menu" id="backToMenuBtn">🏠 В МЕНЮ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ДРЕВО НАВЫКОВ -->
+<div class="fullscreen-screen" id="skillsScreen">
+  <div class="fs-header">
+    <button class="fs-back" id="skillsBack">←</button>
+    <div class="fs-title skills-title">🌲 ДРЕВО НАВЫКОВ</div>
+  </div>
+  <div class="fs-body">
+    <div class="tree-wrap" id="skillsTreeWrap">
+      <svg class="tree-svg" id="skillsSvg"></svg>
+      <div class="tree-canvas" id="skillsCanvas"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ДРЕВО ПРЕСТИЖА -->
+<div class="fullscreen-screen" id="prestigeScreen">
+  <div class="fs-header">
+    <button class="fs-back" id="prestigeBack">←</button>
+    <div class="fs-title tree-title">🌳 ДРЕВО ПРЕСТИЖА</div>
+  </div>
+  <div class="fs-body">
+    <div class="tree-wrap" id="prestigeTreeWrap">
+      <svg class="tree-svg" id="prestigeSvg"></svg>
+      <div class="tree-canvas" id="prestigeCanvas"></div>
+    </div>
+  </div>
+</div>
+
+<!-- РЕБЁРН -->
+<div class="fullscreen-screen" id="rebirthScreen">
+  <div class="fs-header">
+    <button class="fs-back" id="rebirthBack">←</button>
+    <div class="fs-title rebirth-title">🔄 РЕБЁРН</div>
+  </div>
+  <div class="fs-body">
+    <div class="modal-info" id="rebirthInfo" style="max-width:500px;margin:20px auto"></div>
+    <div style="max-width:500px;margin:0 auto">
+      <button class="result-btn again" id="doRebirthBtn" style="width:100%;padding:18px;font-size:16px">🔄 ПЕРЕРОДИТЬСЯ</button>
+    </div>
+  </div>
+</div>
+
+<!-- МОДАЛКА: ЛОГИ -->
+<div class="modal" id="logsModal">
+  <div class="modal-inner">
+    <div class="modal-title">📜 История событий</div>
+    <div class="logs-list" id="logsList"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" id="logsClose">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<!-- МОДАЛКА: СТАТИСТИКА -->
+<div class="modal" id="statsModal">
+  <div class="modal-inner">
+    <div class="modal-title">📊 Статистика</div>
+    <div class="stats-grid" id="statsGrid"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" id="statsClose">Закрыть</button>
+      <button class="btn-danger" id="resetBtn">🗑 Сбросить всё</button>
+    </div>
+  </div>
+</div>
+
+<!-- МОДАЛКА: НАСТРОЙКИ -->
+<div class="modal" id="settingsModal">
+  <div class="modal-inner">
+    <div class="modal-title">⚙ Настройки</div>
+    <div class="daily-box" id="dailyBox">
+      <div style="font-size:14px;font-weight:700;margin-bottom:8px">🎁 Ежедневный подарок</div>
+      <div id="dailyStatus" style="font-size:12px;color:var(--text-2);margin-bottom:12px">Загрузка...</div>
+      <button class="btn-primary" id="claimDailyBtn" style="padding:10px 24px">Забрать</button>
+    </div>
+    <div style="margin-top:16px">
+      <div style="font-size:14px;font-weight:700;margin-bottom:10px">🎨 Скины шахты</div>
+      <div class="skins-grid" id="skinsGrid"></div>
+    </div>
+    <div class="dev-credit">
+      <div class="dev-credit-text">Разработал <b>Babukeka</b></div>
+      <a class="dev-tg-btn" href="https://t.me/babukeka" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+        Написать автору
+      </a>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" id="settingsClose">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ============================================================
+// КОНСТАНТЫ
+// ============================================================
+const SAVE_KEY = 'mine2026_100_v1';
+const LOGS_KEY = 'mine2026_logs_v1';
+const REBIRTHS_PER_PRESTIGE = 3;
+const RUN_DURATION_BASE = 30;
+const BOSS_CHANCE = 0.15;
+const DAILY_COOLDOWN = 24 * 60 * 60 * 1000;
+
+// ============================================================
+// РУДЫ (С КАРТИНКАМИ)
+// ============================================================
+const ORE_TYPES = [
+  { id: 'copper',  name: 'Медь',     icon: '🟤', image: './ores/copper.png',  price: 5,     hp: 3,     weight: 45, life: 4.0, color: '#cd7f32', size: 70, behavior: 'static' },
+  { id: 'silver',  name: 'Серебро',  icon: '⚪', image: './ores/silver.png',  price: 25,    hp: 10,    weight: 25, life: 3.5, color: '#d0d0d0', size: 70, behavior: 'drift' },
+  { id: 'gold',    name: 'Золото',   icon: '🟡', image: './ores/gold.png',    price: 120,   hp: 30,    weight: 15, life: 3.0, color: '#ffd166', size: 72, behavior: 'zigzag' },
+  { id: 'diamond', name: 'Алмаз',    icon: '💎', image: './ores/diamond.png', price: 600,   hp: 100,   weight: 10, life: 2.5, color: '#7ae7ff', size: 72, behavior: 'teleport' },
+  { id: 'mithril', name: 'Мифрил',   icon: '🌌', image: './ores/mithril.png', price: 3000,  hp: 300,   weight: 4,  life: 2.0, color: '#b07cd6', size: 72, behavior: 'fast' },
+  { id: 'plasma',  name: 'Плазма',   icon: '✨', image: './ores/plasma.png',  price: 15000, hp: 1000,  weight: 1,  life: 1.6, color: '#ff3dae', size: 72, behavior: 'dodge' }
+];
+
+const REBIRTH_REQUIREMENTS = [
+  { oreId: 'copper',  amount: 100 },
+  { oreId: 'silver',  amount: 50 },
+  { oreId: 'gold',    amount: 25 },
+  { oreId: 'diamond', amount: 10 },
+  { oreId: 'mithril', amount: 5 },
+  { oreId: 'plasma',  amount: 3 }
+];
+
+const CURRENCY_UNLOCK_AFTER_REBIRTH = {
+  copper: 0, silver: 1, gold: 2, diamond: 3, mithril: 4, plasma: 5
+};
+
+// ============================================================
+// СКИНЫ
+// ============================================================
+const SKINS = {
+  classic: { name: '🌅 Классика', cost: 0, unlocked: true, bg: ['#2a1206', '#14060a', '#0a0204'], accent: '#ffc93c' },
+  ice: { name: '❄️ Ледяная', cost: 5, bg: ['#0a2540', '#051428', '#020a14'], accent: '#7ae7ff' },
+  volcano: { name: '🌋 Вулкан', cost: 8, bg: ['#3a0800', '#1a0400', '#0a0200'], accent: '#ff5a00' },
+  space: { name: '🌠 Космос', cost: 12, bg: ['#1a0040', '#0d0028', '#05000a'], accent: '#e24bff' }
+};
+
+// ============================================================
+// ДРЕВО НАВЫКОВ
+// ============================================================
+const SKILLS_TREE = {
+  root: { name: "⚔️ Урон", icon: "⚔️", desc: "+1 к урону", cost: 100, maxLevel: 10, baseCostMult: 1.5, pos: { x: 800, y: 40 }, parent: null, effect: "damage" },
+  hpReduce: { name: "🔨 Пробивание", icon: "🔨", desc: "+2 к урону", cost: 400, maxLevel: 10, baseCostMult: 1.5, pos: { x: 800, y: 180 }, parent: "root", effect: "damage2" },
+  critHit: { name: "💥 Крит", icon: "💥", desc: "+5% шанс крита (×3)", cost: 1200, maxLevel: 8, baseCostMult: 1.6, pos: { x: 800, y: 320 }, parent: "hpReduce", effect: "critHit" },
+  hpReduce2: { name: "⚔️⚔️ Мега-урон", icon: "⚔️", desc: "+5 к урону", cost: 3000, maxLevel: 10, baseCostMult: 1.7, pos: { x: 800, y: 460 }, parent: "critHit", effect: "damage3" },
+  splash: { name: "💫 Разброс", icon: "💫", desc: "Урон по соседям", cost: 6000, maxLevel: 5, baseCostMult: 1.8, pos: { x: 800, y: 600 }, parent: "hpReduce2", effect: "splash" },
+  oneShot: { name: "☠️ Ваншот", icon: "☠️", desc: "+10% шанс ваншота", cost: 20000, maxLevel: 5, baseCostMult: 2.0, pos: { x: 800, y: 740 }, parent: "splash", effect: "oneShot" },
+  unlockSilver: { name: "🪨 Открыть серебро", icon: "⚪", desc: "Серебро спавнится", cost: 300, maxLevel: 1, baseCostMult: 1, pos: { x: 180, y: 180 }, parent: "root", effect: "unlock_silver", special: "unlock" },
+  unlockGold: { name: "🪨 Открыть золото", icon: "🟡", desc: "Золото спавнится", cost: 1500, maxLevel: 1, baseCostMult: 1, pos: { x: 100, y: 320 }, parent: "unlockSilver", effect: "unlock_gold", special: "unlock" },
+  unlockDiamond: { name: "🪨 Открыть алмаз", icon: "💎", desc: "Алмаз спавнится", cost: 5000, maxLevel: 1, baseCostMult: 1, pos: { x: 60, y: 460 }, parent: "unlockGold", effect: "unlock_diamond", special: "unlock" },
+  unlockMithril: { name: "🪨 Открыть мифрил", icon: "🌌", desc: "Мифрил спавнится", cost: 20000, maxLevel: 1, baseCostMult: 1, pos: { x: 60, y: 600 }, parent: "unlockDiamond", effect: "unlock_mithril", special: "unlock" },
+  unlockPlasma: { name: "🪨 Открыть плазму", icon: "✨", desc: "Плазма спавнится", cost: 80000, maxLevel: 1, baseCostMult: 1, pos: { x: 100, y: 740 }, parent: "unlockMithril", effect: "unlock_plasma", special: "unlock" },
+  chanceSilver: { name: "⚪ Шанс серебра", icon: "⚪", desc: "+5% шанс серебра", cost: 500, maxLevel: 5, baseCostMult: 1.6, pos: { x: 400, y: 320 }, parent: "unlockSilver", effect: "chanceSilver" },
+  chanceGold: { name: "🟡 Шанс золота", icon: "🟡", desc: "+5% шанс золота", cost: 2000, maxLevel: 5, baseCostMult: 1.6, pos: { x: 340, y: 460 }, parent: "chanceSilver", effect: "chanceGold" },
+  chanceDiamond: { name: "💎 Шанс алмаза", icon: "💎", desc: "+3% шанс алмаза", cost: 8000, maxLevel: 5, baseCostMult: 1.7, pos: { x: 300, y: 600 }, parent: "chanceGold", effect: "chanceDiamond" },
+  chanceMithril: { name: "🌌 Шанс мифрила", icon: "🌌", desc: "+2% шанс мифрила", cost: 30000, maxLevel: 5, baseCostMult: 1.8, pos: { x: 300, y: 740 }, parent: "chanceDiamond", effect: "chanceMithril" },
+  chancePlasma: { name: "✨ Шанс плазмы", icon: "✨", desc: "+1% шанс плазмы", cost: 100000, maxLevel: 5, baseCostMult: 2.0, pos: { x: 340, y: 880 }, parent: "chanceMithril", effect: "chancePlasma" },
+  hpSilver: { name: "🩸 HP Серебро", icon: "⚪", desc: "+1 урон по серебру", cost: 800, maxLevel: 5, baseCostMult: 1.7, pos: { x: 180, y: 460 }, parent: "unlockSilver", effect: "hpSilver", hpOre: true },
+  hpGold: { name: "🩸 HP Золото", icon: "🟡", desc: "+2 урона по золоту", cost: 3000, maxLevel: 5, baseCostMult: 1.8, pos: { x: 140, y: 600 }, parent: "hpSilver", effect: "hpGold", hpOre: true },
+  hpDiamond: { name: "🩸 HP Алмаз", icon: "💎", desc: "+3 урона по алмазу", cost: 12000, maxLevel: 5, baseCostMult: 1.9, pos: { x: 140, y: 740 }, parent: "hpGold", effect: "hpDiamond", hpOre: true },
+  hpMithril: { name: "🩸 HP Мифрил", icon: "🌌", desc: "+5 урона по мифрилу", cost: 45000, maxLevel: 5, baseCostMult: 2.0, pos: { x: 180, y: 880 }, parent: "hpDiamond", effect: "hpMithril", hpOre: true },
+  hpPlasma: { name: "🩸 HP Плазма", icon: "✨", desc: "+10 урона по плазме", cost: 150000, maxLevel: 5, baseCostMult: 2.2, pos: { x: 260, y: 1020 }, parent: "hpMithril", effect: "hpPlasma", hpOre: true },
+  speed: { name: "⚡ Скорость", icon: "⚡", desc: "+10% к скорости спавна", cost: 250, maxLevel: 10, baseCostMult: 1.5, pos: { x: 1400, y: 180 }, parent: "root", effect: "speed" },
+  priceUp: { name: "💰 Обогатитель", icon: "💰", desc: "+15% к цене руды", cost: 600, maxLevel: 10, baseCostMult: 1.5, pos: { x: 1480, y: 320 }, parent: "speed", effect: "priceUp" },
+  doubleHit: { name: "🌟 Двойной удар", icon: "🌟", desc: "+5% шанс двойного урона", cost: 3000, maxLevel: 8, baseCostMult: 1.7, pos: { x: 1520, y: 460 }, parent: "priceUp", effect: "doubleHit" },
+  autoHit: { name: "🤖 Автоудар", icon: "🤖", desc: "Автоматически бьёт по 1 HP/сек", cost: 8000, maxLevel: 5, baseCostMult: 1.8, pos: { x: 1520, y: 600 }, parent: "doubleHit", effect: "autoHit" },
+  timer1: { name: "⏱ Хронометр I", icon: "⏱", desc: "+2 сек к забегу", cost: 1500, maxLevel: 5, baseCostMult: 1.7, pos: { x: 1150, y: 320 }, parent: "speed", effect: "timer1" },
+  timer2: { name: "⏱ Хронометр II", icon: "⏱", desc: "+3 сек к забегу", cost: 5000, maxLevel: 5, baseCostMult: 1.8, pos: { x: 1150, y: 460 }, parent: "timer1", effect: "timer2" },
+  timer3: { name: "⏱ Хронометр III", icon: "⏱", desc: "+5 сек к забегу", cost: 15000, maxLevel: 5, baseCostMult: 1.9, pos: { x: 1150, y: 600 }, parent: "timer2", effect: "timer3" },
+  timerMaster: { name: "🕰 Мастер времени", icon: "🕰", desc: "+15 сек к забегу", cost: 50000, maxLevel: 1, baseCostMult: 1, pos: { x: 1150, y: 740 }, parent: "timer3", effect: "timerMaster", special: "unlock" },
+  lifeBonus: { name: "🧲 Магнит", icon: "🧲", desc: "+10% к жизни руды", cost: 800, maxLevel: 10, baseCostMult: 1.5, pos: { x: 980, y: 320 }, parent: "speed", effect: "lifeBonus" }
+};
+
+// ============================================================
+// ДРЕВО ПРЕСТИЖА
+// ============================================================
+const PRESTIGE_TREE = {
+  pRoot: { name: "🌟 Сила престижа", icon: "🌟", desc: "+25% ко всей добыче", cost: 1, maxLevel: 3, baseCostMult: 2.0, pos: { x: 500, y: 40 }, parent: null, effect: "pMega" },
+  pGold: { name: "💰 Золотая жила", icon: "💰", desc: "+30% к цене руды", cost: 1, maxLevel: 3, baseCostMult: 2.0, pos: { x: 280, y: 180 }, parent: "pRoot", effect: "pGold" },
+  pLucky: { name: "🍀 Удача", icon: "🍀", desc: "+15% к шансу редких", cost: 2, maxLevel: 3, baseCostMult: 2.0, pos: { x: 160, y: 320 }, parent: "pGold", effect: "pLucky" },
+  pRebirth: { name: "🔄 Быстрый ребёрн", icon: "🔄", desc: "+10% к очкам", cost: 3, maxLevel: 3, baseCostMult: 2.0, pos: { x: 100, y: 460 }, parent: "pLucky", effect: "pRebirth" },
+  pThrone: { name: "👑 Алмазный трон", icon: "👑", desc: "+5K💰 и +5 сек", cost: 5, maxLevel: 3, baseCostMult: 2.0, pos: { x: 160, y: 600 }, parent: "pRebirth", effect: "pThrone" },
+  pDamage: { name: "⚔️ Мощь", icon: "⚔️", desc: "+5 к урону", cost: 1, maxLevel: 3, baseCostMult: 2.0, pos: { x: 720, y: 180 }, parent: "pRoot", effect: "pDamage" },
+  pSpeed: { name: "⚡ Ускорение", icon: "⚡", desc: "+25% скорость спавна", cost: 2, maxLevel: 3, baseCostMult: 2.0, pos: { x: 840, y: 320 }, parent: "pDamage", effect: "pSpeed" },
+  pMagnet: { name: "🧲 Магнетизм", icon: "🧲", desc: "+30% к жизни руды", cost: 3, maxLevel: 3, baseCostMult: 2.0, pos: { x: 900, y: 460 }, parent: "pSpeed", effect: "pMagnet" },
+  pAutoSell: { name: "⏳ Автосбор", icon: "⏳", desc: "Автосбор руды", cost: 5, maxLevel: 1, baseCostMult: 1, pos: { x: 820, y: 600 }, parent: "pMagnet", effect: "pAutoSell" },
+  pBlackHole: { name: "🌌 Чёрная дыра", icon: "🌌", desc: "×2 ко всей добыче", cost: 10, maxLevel: 3, baseCostMult: 2.5, pos: { x: 720, y: 740 }, parent: "pAutoSell", effect: "pBlackHole" }
+};
+
+// ============================================================
+// СОСТОЯНИЕ ИГРЫ
+// ============================================================
+const state = {
+  money: 0,
+  rebirths: 0,
+  prestigePoints: 0,
+  skills: {},
+  prestigeTree: {},
+  inventory: { copper: 0, silver: 0, gold: 0, diamond: 0, mithril: 0, plasma: 0 },
+  unlockedCurrencies: { copper: true },
+  unlockedOres: { copper: true },
+  unlockedSkins: { classic: true },
+  currentSkin: 'classic',
+  run: {
+    active: false, endsAt: 0, earned: 0, collected: 0, bestOre: null,
+    spawnAccum: 0, fieldOres: [], maxCombo: 0, combo: 0, comboLastHit: 0,
+    bossSpawned: false, bossAt: 0, modifier: null
+  },
+  stats: {
+    totalRuns: 0, bestRun: 0, totalMined: 0, maxMoney: 0, maxPoints: 0,
+    clicksTotal: 0, bossKills: 0, totalCombo: 0
+  },
+  daily: { lastClaimed: 0 },
+  settings: { soundOn: true },
+  lastSave: Date.now(),
+  playStart: Date.now()
+};
+
+let logs = [];
+let audioCtx = null;
+
+// ============================================================
+// ЗВУК (Web Audio API)
+// ============================================================
+function initAudio() {
+  if (!audioCtx) {
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
+  }
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+}
+
+function playSound(type, idx = 0) {
+  if (!state.settings.soundOn) return;
+  initAudio();
+  if (!audioCtx) return;
+  const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  osc.connect(g); g.connect(audioCtx.destination);
+  if (type === 'hit') {
+    osc.type = 'triangle'; osc.frequency.setValueAtTime(180 + idx * 30, now);
+    osc.frequency.exponentialRampToValueAtTime(70, now + 0.08);
+    g.gain.setValueAtTime(0.12, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+    osc.start(now); osc.stop(now + 0.1);
+  } else if (type === 'collect') {
+    const f = 440 + idx * 200;
+    osc.type = 'sine'; osc.frequency.setValueAtTime(f, now);
+    osc.frequency.exponentialRampToValueAtTime(f * 1.5, now + 0.1);
+    g.gain.setValueAtTime(0.15, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+    osc.start(now); osc.stop(now + 0.15);
+  } else if (type === 'buy') {
+    osc.type = 'square'; osc.frequency.setValueAtTime(440, now);
+    osc.frequency.exponentialRampToValueAtTime(660, now + 0.12);
+    g.gain.setValueAtTime(0.08, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+    osc.start(now); osc.stop(now + 0.15);
+  } else if (type === 'unlock') {
+    osc.type = 'triangle'; osc.frequency.setValueAtTime(440, now);
+    osc.frequency.exponentialRampToValueAtTime(1320, now + 0.4);
+    g.gain.setValueAtTime(0.12, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+    osc.start(now); osc.stop(now + 0.5);
+  } else if (type === 'rebirth') {
+    osc.type = 'sawtooth'; osc.frequency.setValueAtTime(220, now);
+    osc.frequency.exponentialRampToValueAtTime(880, now + 0.5);
+    g.gain.setValueAtTime(0.1, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+    osc.start(now); osc.stop(now + 0.6);
+  } else if (type === 'start') {
+    osc.type = 'triangle'; osc.frequency.setValueAtTime(330, now);
+    osc.frequency.exponentialRampToValueAtTime(660, now + 0.2);
+    g.gain.setValueAtTime(0.15, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+    osc.start(now); osc.stop(now + 0.3);
+  } else if (type === 'end') {
+    osc.type = 'sine'; osc.frequency.setValueAtTime(880, now);
+    osc.frequency.exponentialRampToValueAtTime(220, now + 0.6);
+    g.gain.setValueAtTime(0.15, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+    osc.start(now); osc.stop(now + 0.7);
+  } else if (type === 'crit') {
+    osc.type = 'square'; osc.frequency.setValueAtTime(880, now);
+    osc.frequency.exponentialRampToValueAtTime(1760, now + 0.15);
+    g.gain.setValueAtTime(0.15, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+    osc.start(now); osc.stop(now + 0.2);
+  }
+}
+
+// ============================================================
+// УТИЛИТЫ
+// ============================================================
+function fmt(n) {
+  if (!isFinite(n)) return "∞";
+  if (n < 0) return "-" + fmt(-n);
+  if (n < 1000) return Math.floor(n).toString();
+  if (n < 1e6) return (n / 1e3).toFixed(2) + "K";
+  if (n < 1e9) return (n / 1e6).toFixed(2) + "M";
+  if (n < 1e12) return (n / 1e9).toFixed(2) + "B";
+  if (n < 1e15) return (n / 1e12).toFixed(2) + "T";
+  return (n / 1e15).toFixed(2) + "Qa";
+}
+
+function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+function $(id) { return document.getElementById(id); }
+
+// ============================================================
+// ЛОГИ
+// ============================================================
+function logEvent(message) {
+  const entry = { time: Date.now(), message };
+  logs.unshift(entry);
+  if (logs.length > 50) logs.length = 50;
+  try { localStorage.setItem(LOGS_KEY, JSON.stringify(logs)); } catch (e) {}
+}
+
+function loadLogs() {
+  try {
+    const raw = localStorage.getItem(LOGS_KEY);
+    if (raw) logs = JSON.parse(raw);
+  } catch (e) { logs = []; }
+}
+
+// ============================================================
+// ТОСТЫ
+// ============================================================
+function showToast(text, type = 'mint', duration = 2000) {
+  const container = $('toastContainer');
+  if (!container) return;
+  const toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  toast.textContent = text;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add('out');
+    setTimeout(() => toast.remove(), 300);
+  }, duration);
+}
+
+// ============================================================
+// ЧАСТИЦЫ И ВИЗУАЛ
+// ============================================================
+function spawnParticle(x, y, text, className = '') {
+  const el = document.createElement('div');
+  el.className = 'click-particle ' + className;
+  el.textContent = text;
+  el.style.left = x + 'px';
+  el.style.top = y + 'px';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 900);
+}
+
+function screenFlash() {
+  const el = document.createElement('div');
+  el.className = 'screen-flash';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 300);
+}
+
+function spawnDust() {
+  const p = document.createElement('div');
+  p.className = 'dust';
+  p.style.left = Math.random() * 100 + 'vw';
+  p.style.top = (100 + Math.random() * 20) + 'vh';
+  const dur = 8 + Math.random() * 8;
+  p.style.animationDuration = dur + 's';
+  const size = 2 + Math.random() * 3;
+  p.style.width = size + 'px';
+  p.style.height = size + 'px';
+  const particles = $('particles');
+  if (particles) particles.appendChild(p);
+  setTimeout(() => p.remove(), dur * 1000);
+}
+
+// ============================================================
+// ДРЕВО НАВЫКОВ: ХЕЛПЕРЫ
+// ============================================================
+function getSkillLevel(id) { return state.skills[id] || 0; }
+function isSkillMaxed(id) { return getSkillLevel(id) >= SKILLS_TREE[id].maxLevel; }
+function isSkillUnlocked(id) {
+  const node = SKILLS_TREE[id];
+  if (!node.parent) return true;
+  return getSkillLevel(node.parent) > 0;
+}
+function getSkillCost(id) {
+  const node = SKILLS_TREE[id];
+  return Math.floor(node.cost * Math.pow(node.baseCostMult, getSkillLevel(id)));
+}
+
+function buySkill(id) {
+  if (!isSkillUnlocked(id) || isSkillMaxed(id)) return;
+  const cost = getSkillCost(id);
+  if (state.money < cost) {
+    showToast(`Не хватает ${fmt(cost - state.money)}💰`, 'red', 1500);
+    return;
+  }
+  state.money -= cost;
+  state.skills[id] = getSkillLevel(id) + 1;
+  const node = SKILLS_TREE[id];
+  if (node.special === 'unlock') {
+    const oreId = node.effect.replace('unlock_', '');
+    const ore = ORE_TYPES.find(o => o.id === oreId);
+    if (ore) {
+      state.unlockedOres[oreId] = true;
+      showToast(`🪨 Открыто: ${ore.icon} ${ore.name}`, 'mint', 2000);
+      logEvent(`Открыта руда: ${ore.name}`);
+      playSound('unlock');
+    }
+  } else {
+    playSound('buy');
+  }
+  renderSkillsTree();
+  updateUI();
+}
+
+// ============================================================
+// ПРЕСТИЖ: ХЕЛПЕРЫ
+// ============================================================
+function getPLevel(id) { return state.prestigeTree[id] || 0; }
+function isPMaxed(id) { return getPLevel(id) >= PRESTIGE_TREE[id].maxLevel; }
+function isPUnlocked(id) {
+  const node = PRESTIGE_TREE[id];
+  if (!node.parent) return true;
+  return getPLevel(node.parent) > 0;
+}
+function getPCost(id) {
+  const node = PRESTIGE_TREE[id];
+  return Math.ceil(node.cost * Math.pow(node.baseCostMult, getPLevel(id)));
+}
+
+function buyPrestige(id) {
+  if (!isPUnlocked(id) || isPMaxed(id)) return;
+  const cost = getPCost(id);
+  if (state.prestigePoints < cost) {
+    showToast(`Не хватает ${cost - state.prestigePoints} 🌟`, 'red', 1500);
+    return;
+  }
+  state.prestigePoints -= cost;
+  state.prestigeTree[id] = getPLevel(id) + 1;
+  playSound('buy');
+  renderPrestigeTree();
+  updateUI();
+}
+
+// ============================================================
+// ЭФФЕКТЫ И БОНУСЫ
+// ============================================================
+function getDamage() {
+  return 1 + getSkillLevel('root') * 1 + getSkillLevel('hpReduce') * 2 + getSkillLevel('hpReduce2') * 5 + getPLevel('pDamage') * 5;
+}
+
+function getOreSpecificDamage(oreId) {
+  const map = { silver: 'hpSilver', gold: 'hpGold', diamond: 'hpDiamond', mithril: 'hpMithril', plasma: 'hpPlasma' };
+  const key = map[oreId];
+  if (!key) return 0;
+  const bonus = { silver: 1, gold: 2, diamond: 3, mithril: 5, plasma: 10 }[oreId] || 0;
+  return getSkillLevel(key) * bonus;
+}
+
+function getCritChance() { return getSkillLevel('critHit') * 0.05; }
+function getCritMultiplier() { return 3; }
+function getDoubleDamageChance() { return getSkillLevel('doubleHit') * 0.05; }
+function getOneShotChance() { return getSkillLevel('oneShot') * 0.10; }
+function getAutoHit() { return getSkillLevel('autoHit') * 1; }
+function getSplash() { return getSkillLevel('splash') > 0; }
+
+function getSpawnInterval() {
+  let interval = 1.0;
+  interval /= 1 + getSkillLevel('speed') * 0.10;
+  interval /= 1 + getPLevel('pSpeed') * 0.25;
+  return Math.max(0.2, interval);
+}
+
+function getRunDuration() {
+  let sec = RUN_DURATION_BASE;
+  sec += getSkillLevel('timer1') * 2;
+  sec += getSkillLevel('timer2') * 3;
+  sec += getSkillLevel('timer3') * 5;
+  sec += getSkillLevel('timerMaster') * 15;
+  sec += getPLevel('pThrone') * 5;
+  return sec;
+}
+
+function getOrePriceMult() {
+  let m = 1;
+  m *= 1 + getSkillLevel('priceUp') * 0.15;
+  m *= 1 + getPLevel('pGold') * 0.30;
+  return m;
+}
+
+function getOreLifeBonus() {
+  return 1 + getSkillLevel('lifeBonus') * 0.10 + getPLevel('pMagnet') * 0.30;
+}
+
+function getRebirthBonus() { return 1 + state.rebirths * 0.25; }
+function getMegaMultiplier() { return Math.pow(2, getPLevel('pBlackHole')); }
+function getGlobalMultiplier() { return (1 + getPLevel('pRoot') * 0.25) * getMegaMultiplier(); }
+function getPointsPerRebirth() { return (1 / REBIRTHS_PER_PRESTIGE) * (1 + getPLevel('pRebirth') * 0.10); }
+function hasAutoCollect() { return getPLevel('pAutoSell') > 0; }
+function getComboMultiplier() { return 1 + Math.floor(state.run.combo / 10) * 0.1; }
+
+// ============================================================
+// ШАНСЫ РУД
+// ============================================================
+function getOreWeights() {
+  const weights = ORE_TYPES.map(o => state.unlockedOres[o.id] ? o.weight : 0);
+  const bonusMap = {
+    silver: getSkillLevel('chanceSilver') * 5,
+    gold: getSkillLevel('chanceGold') * 5,
+    diamond: getSkillLevel('chanceDiamond') * 3,
+    mithril: getSkillLevel('chanceMithril') * 2,
+    plasma: getSkillLevel('chancePlasma') * 1
+  };
+  ORE_TYPES.forEach((o, i) => {
+    if (!state.unlockedOres[o.id]) return;
+    weights[i] += bonusMap[o.id] || 0;
+  });
+  const lucky = getPLevel('pLucky') * 0.15;
+  ORE_TYPES.forEach((o, i) => {
+    if (!state.unlockedOres[o.id]) return;
+    weights[i] *= (1 + lucky * (i / (ORE_TYPES.length - 1)));
+  });
+  let totalBoost = 0;
+  const keyMap = { silver: 'chanceSilver', gold: 'chanceGold', diamond: 'chanceDiamond', mithril: 'chanceMithril', plasma: 'chancePlasma' };
+  for (const id in keyMap) totalBoost += getSkillLevel(keyMap[id]);
+  if (totalBoost > 0) {
+    for (let i = 1; i < weights.length; i++) {
+      if (weights[i] <= 0) continue;
+      const rf = (weights.length - 1 - i) / (weights.length - 1);
+      weights[i] *= Math.max(0.05, 1 - totalBoost * 0.02 * rf);
+    }
+  }
+  return weights;
+}
+
+function pickRandomOre() {
+  const weights = getOreWeights();
+  const total = weights.reduce((s, w) => s + w, 0);
+  if (total <= 0) return { ore: ORE_TYPES[0], idx: 0 };
+  let roll = Math.random() * total;
+  for (let i = 0; i < ORE_TYPES.length; i++) {
+    if (weights[i] <= 0) continue;
+    roll -= weights[i];
+    if (roll <= 0) return { ore: ORE_TYPES[i], idx: i };
+  }
+  return { ore: ORE_TYPES[0], idx: 0 };
+}
+
+// ============================================================
+// СПАВН РУДЫ
+// ============================================================
+function spawnOre() {
+  const field = $('runField'); if (!field) return;
+  const { ore, idx } = pickRandomOre();
+  const rect = field.getBoundingClientRect();
+  const isMobile = window.innerWidth < 720;
+  const size = isMobile ? 60 : ore.size;
+  const padding = size + 10;
+  const node = document.createElement('div');
+  node.className = 'ore-node';
+  node.style.setProperty('--ore-color', ore.color);
+  node.style.width = size + 'px';
+  node.style.height = size + 'px';
+  node.innerHTML = `<img src="${ore.image}" class="ore-image" alt="${ore.name}"><div class="hp-bar"><div class="hp-fill" style="width:100%"></div></div><div class="hp-text">${ore.hp}</div>`;
+  const x = padding + Math.random() * Math.max(20, rect.width - padding * 2);
+  const y = 100 + Math.random() * Math.max(20, rect.height - 200);
+  node.style.left = x + 'px'; node.style.top = y + 'px';
+  if (ore.behavior === 'zigzag') node.classList.add('zigzag');
+  if (ore.behavior === 'drift' || ore.behavior === 'fast' || ore.behavior === 'teleport') node.classList.add('moving');
+  const life = ore.life * getOreLifeBonus() * 1000;
+  const expiresAt = Date.now() + life;
+  const oreRef = { el: node, ore, idx, expiresAt, hp: ore.hp, maxHp: ore.hp, basePrice: ore.price, collected: false, lastMove: Date.now(), behavior: ore.behavior, isBoss: false };
+  state.run.fieldOres.push(oreRef);
+  node.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); hitOre(oreRef, e.clientX, e.clientY); });
+  field.appendChild(node);
+}
+
+function spawnBoss() {
+  const field = $('runField'); if (!field) return;
+  const available = ORE_TYPES.filter(o => state.unlockedOres[o.id]);
+  const ore = available[available.length - 1] || ORE_TYPES[0];
+  const idx = ORE_TYPES.indexOf(ore);
+  const rect = field.getBoundingClientRect();
+  const isMobile = window.innerWidth < 720;
+  const size = isMobile ? 110 : 160;
+  const padding = size + 20;
+  const node = document.createElement('div');
+  node.className = 'ore-node boss';
+  node.style.setProperty('--ore-color', ore.color);
+  node.style.width = size + 'px'; node.style.height = size + 'px';
+  node.innerHTML = `<div class="boss-crown">👑</div><img src="${ore.image}" class="ore-image" alt="${ore.name}"><div class="hp-bar"><div class="hp-fill" style="width:100%"></div></div><div class="hp-text">${ore.hp * 20}</div>`;
+  const x = padding + Math.random() * Math.max(20, rect.width - padding * 2);
+  const y = 120 + Math.random() * Math.max(20, rect.height - 220);
+  node.style.left = x + 'px'; node.style.top = y + 'px';
+  const oreRef = { el: node, ore, idx, expiresAt: Date.now() + 12000, hp: ore.hp * 20, maxHp: ore.hp * 20, basePrice: ore.price * 10, collected: false, isBoss: true, lastMove: Date.now(), behavior: 'static' };
+  state.run.fieldOres.push(oreRef);
+  node.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); hitOre(oreRef, e.clientX, e.clientY); });
+  field.appendChild(node);
+  showToast(`👑 БОСС! ${ore.icon} ×20 HP`, 'gold', 3000);
+  logEvent(`Появился босс: ${ore.name}`);
+}
+
+// ============================================================
+// УДАР ПО РУДЕ
+// ============================================================
+function hitOre(oreRef, x, y) {
+  if (!state.run.active || oreRef.collected) return;
+  const now = Date.now();
+  if (now - state.run.comboLastHit < 3000) { state.run.combo++; } else { state.run.combo = 1; }
+  state.run.comboLastHit = now;
+  if (state.run.combo > state.run.maxCombo) state.run.maxCombo = state.run.combo;
+  if (Math.random() < getOneShotChance() && !oreRef.isBoss) { oreRef.hp = 0; updateOreHp(oreRef); spawnParticle(x, y, "☠️", 'damage'); return collectOre(oreRef, x, y); }
+  let dmg = getDamage() + getOreSpecificDamage(oreRef.ore.id);
+  const isCrit = Math.random() < getCritChance();
+  const isDouble = Math.random() < getDoubleDamageChance();
+  if (isDouble) dmg *= 2;
+  if (isCrit) dmg *= getCritMultiplier();
+  if (getSplash() && !oreRef.isBoss) applySplash(oreRef, Math.floor(dmg * 0.3));
+  oreRef.hp -= dmg;
+  state.stats.clicksTotal++;
+  oreRef.el.classList.remove('hit'); void oreRef.el.offsetWidth; oreRef.el.classList.add('hit');
+  if (x && y) { const text = "-" + dmg + (isCrit ? " 💥" : ""); spawnParticle(x, y, text, isCrit ? 'crit' : 'damage'); }
+  if (isCrit) { playSound('crit'); screenFlash(); } else { playSound('hit', oreRef.idx); }
+  if (oreRef.hp <= 0) { oreRef.hp = 0; collectOre(oreRef, x, y); } else { updateOreHp(oreRef); }
+  updateRunHud();
+}
+
+function applySplash(sourceOre, dmg) {
+  for (const oreRef of state.run.fieldOres) {
+    if (oreRef === sourceOre || oreRef.collected || oreRef.isBoss) continue;
+    const dx = parseInt(oreRef.el.style.left) - parseInt(sourceOre.el.style.left);
+    const dy = parseInt(oreRef.el.style.top) - parseInt(sourceOre.el.style.top);
+    if (Math.sqrt(dx * dx + dy * dy) < 150) {
+      oreRef.hp -= dmg;
+      updateOreHp(oreRef);
+      if (oreRef.hp <= 0) { oreRef.hp = 0; collectOre(oreRef, null, null); }
+    }
+  }
+}
+
+function updateOreHp(oreRef) {
+  const pct = (oreRef.hp / oreRef.maxHp) * 100;
+  const fill = oreRef.el.querySelector('.hp-fill');
+  const text = oreRef.el.querySelector('.hp-text');
+  if (fill) { fill.style.width = Math.max(0, pct) + '%'; fill.classList.toggle('low', pct < 30); }
+  if (text) text.textContent = Math.max(0, Math.ceil(oreRef.hp));
+}
+
+function collectOre(oreRef, x, y) {
+  if (oreRef.collected) return;
+  oreRef.collected = true;
+  const { ore, idx, basePrice } = oreRef;
+  const comboMult = getComboMultiplier();
+  let price = basePrice * getOrePriceMult() * getRebirthBonus() * getGlobalMultiplier() * comboMult;
+  state.money += price;
+  state.run.earned += price;
+  state.run.collected += 1;
+  state.stats.totalMined += 1;
+  if (state.money > state.stats.maxMoney) state.stats.maxMoney = state.money;
+  if (state.unlockedCurrencies[ore.id]) { state.inventory[ore.id] = (state.inventory[ore.id] || 0) + 1; }
+  if (!state.run.bestOre || ore.price > state.run.bestOre.price || oreRef.isBoss) { state.run.bestOre = ore; }
+  if (oreRef.isBoss) { state.stats.bossKills++; showToast(`👑 БОСС побеждён! +${fmt(price)}💰`, 'gold', 2500); logEvent(`Убит босс: ${ore.name}`); }
+  oreRef.el.classList.add('collected');
+  if (x && y) spawnParticle(x, y, "+" + fmt(price), '');
+  playSound('collect', idx);
+  setTimeout(() => { oreRef.el.remove(); const i = state.run.fieldOres.indexOf(oreRef); if (i >= 0) state.run.fieldOres.splice(i, 1); }, 450);
+  updateUI();
+}
+
+// ============================================================
+// ЗАБЕГ
+// ============================================================
+function startRun() {
+  if (state.run.active) return;
+  const modifiers = [
+    { id: 'fast', name: '⚡ Быстрый', mult: 2, durMult: 0.5, chance: 0.15 },
+    { id: 'rich', name: '💎 Богатый', mult: 3, durMult: 1, chance: 0.1 },
+    { id: 'chaos', name: '🔥 Хаос', mult: 1.5, durMult: 0.6, chance: 0.1 },
+    { id: 'calm', name: '🧘 Спокойный', mult: 0.6, durMult: 2, chance: 0.15 }
+  ];
+  let modifier = null;
+  if (Math.random() < 0.4) {
+    const roll = Math.random();
+    let acc = 0;
+    for (const m of modifiers) { acc += m.chance; if (roll < acc) { modifier = m; break; } }
+    if (!modifier) modifier = modifiers[Math.floor(Math.random() * modifiers.length)];
+  }
+  state.run.modifier = modifier;
+  const duration = Math.round(getRunDuration() * (modifier ? modifier.durMult : 1));
+  const field = $('runField');
+  field.innerHTML = '';
+  state.run.fieldOres = [];
+  state.run.active = true;
+  state.run.endsAt = Date.now() + duration * 1000;
+  state.run.earned = 0;
+  state.run.collected = 0;
+  state.run.bestOre = null;
+  state.run.spawnAccum = 0;
+  state.run.combo = 0;
+  state.run.maxCombo = 0;
+  state.run.comboLastHit = 0;
+  state.run.bossSpawned = false;
+  state.run.bossAt = Date.now() + Math.random() * duration * 400 + duration * 200;
+  state.run.startedAt = Date.now();
+  state.run.duration = duration;
+  $('runResult').classList.remove('active');
+  $('screenMain').classList.add('hidden');
+  $('screenRun').classList.add('active');
+  if (modifier) { showToast(`${modifier.name} забег! ×${modifier.mult} денег, ${duration} сек`, 'purple', 3000); logEvent(`Забег: ${modifier.name}`); }
+  else { logEvent(`Забег начат: ${duration} сек`); }
+  playSound('start');
+  updateRunHud();
+}
+
+function endRun(manual = false) {
+  if (!state.run.active) return;
+  state.run.active = false;
+  state.stats.totalRuns++;
+  if (state.run.earned > state.stats.bestRun) state.stats.bestRun = state.run.earned;
+  state.stats.totalCombo = (state.stats.totalCombo || 0) + state.run.maxCombo;
+  $('runField').innerHTML = '';
+  state.run.fieldOres = [];
+  $('resultTitle').textContent = manual ? '⏹ Забег завершён' : '🏁 Забег завершён!';
+  $('resultCount').textContent = state.run.collected;
+  $('resultMoney').textContent = fmt(state.run.earned);
+  $('resultBest').textContent = state.run.bestOre ? state.run.bestOre.icon + ' ' + state.run.bestOre.name : '—';
+  $('resultCombo').textContent = state.run.maxCombo;
+  $('runResult').classList.add('active');
+  playSound('end');
+  logEvent(`Забег завершён: ${state.run.collected} руды, ${fmt(state.run.earned)}💰`);
+  updateUI();
+}
+
+function closeRunAndReturn() {
+  $('screenRun').classList.remove('active');
+  $('screenMain').classList.remove('hidden');
+  $('runResult').classList.remove('active');
+}
+
+function updateRunHud() {
+  if (!state.run.active) return;
+  const remaining = Math.max(0, (state.run.endsAt - Date.now()) / 1000);
+  const duration = state.run.duration || getRunDuration();
+  $('timerValue').textContent = remaining.toFixed(1);
+  $('timerTile').classList.toggle('urgent', remaining <= 5);
+  $('runMoney').textContent = fmt(state.run.earned);
+  $('comboValue').textContent = '×' + state.run.combo + (state.run.combo >= 10 ? ' 🎯' : '');
+  $('comboTile').classList.toggle('hot', state.run.combo >= 30);
+  const pct = (remaining / duration) * 100;
+  $('runProgressFill').style.width = pct + '%';
+  $('runProgressFill').classList.toggle('urgent', remaining <= 5);
+}
+
+// ============================================================
+// РЕБЁРН
+// ============================================================
+function getRebirthRequirement() {
+  const idx = Math.min(state.rebirths, REBIRTH_REQUIREMENTS.length - 1);
+  return REBIRTH_REQUIREMENTS[idx];
+}
+
+function canRebirth() {
+  const req = getRebirthRequirement();
+  return state.inventory[req.oreId] >= req.amount;
+}
+
+function doRebirth() {
+  if (!canRebirth()) {
+    const req = getRebirthRequirement();
+    const ore = ORE_TYPES.find(o => o.id === req.oreId);
+    const have = state.inventory[req.oreId] || 0;
+    showToast(`Не хватает ${req.amount - have} ${ore.name.toLowerCase()}`, 'red', 2500);
+    return;
+  }
+  const req = getRebirthRequirement();
+  state.inventory[req.oreId] -= req.amount;
+  state.rebirths++;
+  const per = getPointsPerRebirth();
+  const earned = Math.floor(state.rebirths * per) - Math.floor((state.rebirths - 1) * per);
+  if (earned > 0) {
+    state.prestigePoints += earned;
+    if (state.prestigePoints > state.stats.maxPoints) state.stats.maxPoints = state.prestigePoints;
+    showToast(`🌟 +${earned} очко престижа!`, 'purple', 3000);
+  }
+  for (const oreId in CURRENCY_UNLOCK_AFTER_REBIRTH) {
+    if (state.rebirths >= CURRENCY_UNLOCK_AFTER_REBIRTH[oreId] && !state.unlockedCurrencies[oreId]) {
+      state.unlockedCurrencies[oreId] = true;
+      state.unlockedOres[oreId] = true;
+      const ore = ORE_TYPES.find(o => o.id === oreId);
+      if (ore) { showToast(`🪨 Открыта валюта: ${ore.icon} ${ore.name}`, 'gold', 3500); logEvent(`Открыта валюта: ${ore.name}`); playSound('unlock'); }
+    }
+  }
+  state.money = 0;
+  state.skills = {};
+  playSound('rebirth');
+  logEvent(`Ребёрн #${state.rebirths}!`);
+  showToast(`🔄 Ребёрн #${state.rebirths}`, 'gold', 3000);
+  closeRebirthScreen();
+  renderSkillsTree();
+  updateUI();
+  refreshCurrenciesPanel();
+}
+
+// ============================================================
+// UI ОБНОВЛЕНИЕ
+// ============================================================
+let uiQueued = false;
+function updateUI() {
+  if (uiQueued) return;
+  uiQueued = true;
+  requestAnimationFrame(() => { uiQueued = false; renderUI(); });
+}
+
+function renderUI() {
+  const moneyEl = $('moneyDisplay'); if (moneyEl) moneyEl.textContent = fmt(state.money);
+  const rebirthsEl = $('rebirthsDisplay'); if (rebirthsEl) rebirthsEl.textContent = state.rebirths;
+  const totalSkills = Object.values(state.skills).reduce((s, v) => s + v, 0);
+  const skillsSub = $('skillsSub'); if (skillsSub) skillsSub.textContent = totalSkills + ' узлов';
+  const prestigeSub = $('prestigeSub'); if (prestigeSub) prestigeSub.textContent = state.prestigePoints + ' 🌟';
+  const rebirthBtn = $('rebirthBtn'); if (rebirthBtn) rebirthBtn.classList.toggle('ready', canRebirth());
+  refreshCurrenciesPanel();
+  const skillsBtn = $('skillsBtn');
+  if (skillsBtn) {
+    const canBuyAny = Object.keys(SKILLS_TREE).some(id => isSkillUnlocked(id) && !isSkillMaxed(id) && state.money >= getSkillCost(id));
+    skillsBtn.style.boxShadow = canBuyAny ? '0 12px 36px rgba(122,63,255,0.6), 0 0 40px rgba(166,107,255,0.5)' : '';
+  }
+}
+
+function refreshCurrenciesPanel() {
+  const panel = $('currenciesPanel'); if (!panel) return;
+  panel.innerHTML = '';
+  for (const ore of ORE_TYPES) {
+    const unlocked = state.unlockedCurrencies[ore.id];
+    const count = state.inventory[ore.id] || 0;
+    const el = document.createElement('div');
+    el.className = 'currency-item ' + (unlocked ? 'unlocked' : 'locked');
+    el.style.setProperty('--curr-color', ore.color);
+    el.innerHTML = `<div class="currency-icon">${ore.icon}</div><div class="currency-name">${ore.name}</div><div class="currency-count">${unlocked ? count : '?'}</div>${!unlocked ? '<div class="currency-lock">🔒</div>' : ''}`;
+    panel.appendChild(el);
+  }
+}
+
+// ============================================================
+// РЕНДЕР ДРЕВА НАВЫКОВ
+// ============================================================
+function renderSkillsTree() {
+  const canvas = $('skillsCanvas'); if (!canvas) return;
+  const svg = $('skillsSvg'); if (!svg) return;
+  let maxX = 0, maxY = 0;
+  for (const id in SKILLS_TREE) { const pos = SKILLS_TREE[id].pos; if (pos.x > maxX) maxX = pos.x; if (pos.y > maxY) maxY = pos.y; }
+  const W = maxX + 250, H = maxY + 200;
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  svg.setAttribute('width', W); svg.setAttribute('height', H);
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  let linesHTML = '';
+  for (const id in SKILLS_TREE) {
+    const node = SKILLS_TREE[id];
+    if (!node.parent) continue;
+    const p = SKILLS_TREE[node.parent].pos;
+    const c = node.pos;
+    const revealed = isSkillUnlocked(id);
+    const color = revealed ? '#a66bff' : '#333355';
+    const dash = revealed ? '0' : '4,4';
+    linesHTML += `<line x1="${p.x + 70}" y1="${p.y + 50}" x2="${c.x + 70}" y2="${c.y + 50}" stroke="${color}" stroke-width="2" stroke-dasharray="${dash}" opacity="${revealed ? 0.6 : 0.25}" />`;
+  }
+  svg.innerHTML = linesHTML;
+  canvas.querySelectorAll('.tnode').forEach(n => n.remove());
+  for (const id in SKILLS_TREE) {
+    const node = SKILLS_TREE[id];
+    const level = getSkillLevel(id);
+    const maxed = isSkillMaxed(id);
+    const unlocked = isSkillUnlocked(id);
+    const cost = getSkillCost(id);
+    const canBuy = unlocked && !maxed && state.money >= cost;
+    const el = document.createElement('div');
+    el.className = 'tnode';
+    if (node.hpOre) el.classList.add('hp-ore-node');
+    el.style.left = node.pos.x + 'px';
+    el.style.top = node.pos.y + 'px';
+    el.style.setProperty('--node-accent', node.hpOre ? '#ff7a8a' : '#a66bff');
+    el.style.setProperty('--node-glow', node.hpOre ? 'rgba(255,90,110,0.5)' : 'rgba(166,107,255,0.5)');
+    if (!unlocked) {
+      el.classList.add('mystery');
+      el.innerHTML = `<div class="tnode-icon">❓</div><div class="tnode-name">???</div><div class="tnode-level">&nbsp;</div><div class="tnode-desc">Купи предыдущий</div><div class="tnode-cost" style="opacity:0.4">🔒</div>`;
+      canvas.appendChild(el);
+      continue;
+    }
+    if (maxed) el.classList.add('maxed');
+    else if (!canBuy) el.classList.add('locked');
+    el.innerHTML = `<div class="tnode-icon">${node.icon}</div><div class="tnode-name">${node.name}</div><div class="tnode-level">[${level}/${node.maxLevel}]</div><div class="tnode-desc">${node.desc}</div><div class="tnode-cost">${maxed ? '✅ МАКС' : fmt(cost) + '💰'}</div>`;
+    if (!maxed && canBuy) el.addEventListener('click', () => buySkill(id));
+    canvas.appendChild(el);
+  }
+}
+
+// ============================================================
+// РЕНДЕР ДРЕВА ПРЕСТИЖА
+// ============================================================
+function renderPrestigeTree() {
+  const canvas = $('prestigeCanvas'); if (!canvas) return;
+  const svg = $('prestigeSvg'); if (!svg) return;
+  let maxX = 0, maxY = 0;
+  for (const id in PRESTIGE_TREE) { const pos = PRESTIGE_TREE[id].pos; if (pos.x > maxX) maxX = pos.x; if (pos.y > maxY) maxY = pos.y; }
+  const W = maxX + 250, H = maxY + 200;
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  svg.setAttribute('width', W); svg.setAttribute('height', H);
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  let linesHTML = '';
+  for (const id in PRESTIGE_TREE) {
+    const node = PRESTIGE_TREE[id];
+    if (!node.parent) continue;
+    const p = PRESTIGE_TREE[node.parent].pos;
+    const c = node.pos;
+    const revealed = isPUnlocked(id);
+    const color = revealed ? '#00f5a0' : '#333355';
+    const dash = revealed ? '0' : '4,4';
+    linesHTML += `<line x1="${p.x + 70}" y1="${p.y + 50}" x2="${c.x + 70}" y2="${c.y + 50}" stroke="${color}" stroke-width="2" stroke-dasharray="${dash}" opacity="${revealed ? 0.6 : 0.25}" />`;
+  }
+  svg.innerHTML = linesHTML;
+  canvas.querySelectorAll('.tnode').forEach(n => n.remove());
+  for (const id in PRESTIGE_TREE) {
+    const node = PRESTIGE_TREE[id];
+    const level = getPLevel(id);
+    const maxed = isPMaxed(id);
+    const unlocked = isPUnlocked(id);
+    const cost = getPCost(id);
+    const canBuy = unlocked && !maxed && state.prestigePoints >= cost;
+    const el = document.createElement('div');
+    el.className = 'tnode';
+    el.style.left = node.pos.x + 'px';
+    el.style.top = node.pos.y + 'px';
+    el.style.setProperty('--node-accent', '#00f5a0');
+    el.style.setProperty('--node-glow', 'rgba(0,245,160,0.5)');
+    if (!unlocked) {
+      el.classList.add('mystery');
+      el.innerHTML = `<div class="tnode-icon">❓</div><div class="tnode-name">???</div><div class="tnode-level">&nbsp;</div><div class="tnode-desc">Купи предыдущий</div><div class="tnode-cost" style="opacity:0.4">🔒</div>`;
+      canvas.appendChild(el);
+      continue;
+    }
+    if (maxed) el.classList.add('maxed');
+    else if (!canBuy) el.classList.add('locked');
+    el.innerHTML = `<div class="tnode-icon">${node.icon}</div><div class="tnode-name">${node.name}</div><div class="tnode-level">[${level}/${node.maxLevel}]</div><div class="tnode-desc">${node.desc}</div><div class="tnode-cost">${maxed ? '✅ МАКС' : cost + ' 🌟'}</div>`;
+    if (!maxed && canBuy) el.addEventListener('click', () => buyPrestige(id));
+    canvas.appendChild(el);
+  }
+}
+
+function openScreen(id) { document.querySelectorAll('.fullscreen-screen').forEach(s => s.classList.remove('active')); $(id).classList.add('active'); }
+function closeScreen(id) { $(id).classList.remove('active'); }
+function closeRebirthScreen() { closeScreen('rebirthScreen'); }
+
+function updateRebirthInfo() {
+  const req = getRebirthRequirement();
+  const ore = ORE_TYPES.find(o => o.id === req.oreId);
+  const have = state.inventory[req.oreId] || 0;
+  const canDo = have >= req.amount;
+  const nextCurrency = ORE_TYPES.find(o => CURRENCY_UNLOCK_AFTER_REBIRTH[o.id] === state.rebirths + 1);
+  const info = $('rebirthInfo'); if (!info) return;
+  info.innerHTML = `<div class="modal-row"><span>Ребёрнов:</span><span>${state.rebirths}</span></div><div class="modal-row"><span>Текущий бонус:</span><span>×${getRebirthBonus().toFixed(2)}</span></div><div class="modal-row"><span>Нужно:</span><span>${req.amount} ${ore.icon} ${ore.name}</span></div><div class="modal-row"><span>У вас:</span><span>${have} ${ore.icon}</span></div><div class="modal-row"><span>До очка:</span><span>${Math.max(0, REBIRTHS_PER_PRESTIGE - (state.rebirths % REBIRTHS_PER_PRESTIGE))}</span></div>${nextCurrency ? `<div class="modal-row"><span>Откроется:</span><span>${nextCurrency.icon} ${nextCurrency.name}</span></div>` : ''}`;
+  const btn = $('doRebirthBtn');
+  if (btn) { btn.disabled = !canDo; btn.style.opacity = canDo ? '1' : '0.5'; }
+}
+
+// ============================================================
+// МОДАЛКИ
+// ============================================================
+function openModal(id) { const el = $(id); if (el) el.classList.add('active'); }
+function closeModal(id) { const el = $(id); if (el) el.classList.remove('active'); }
+
+function renderLogs() {
+  const list = $('logsList'); if (!list) return;
+  if (logs.length === 0) { list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-3)">Пусто</div>'; return; }
+  list.innerHTML = logs.map(l => { const d = new Date(l.time); const time = d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }); return `<div class="log-line"><span class="log-time">${time}</span>${l.message}</div>`; }).join('');
+}
+
+function renderStats() {
+  const playTime = Math.floor((Date.now() - state.playStart) / 1000);
+  const h = Math.floor(playTime / 3600), m = Math.floor((playTime % 3600) / 60);
+  const grid = $('statsGrid'); if (!grid) return;
+  grid.innerHTML = `<div class="stat-box"><div class="stat-box-label">Забегов</div><div class="stat-box-value">${state.stats.totalRuns}</div></div><div class="stat-box"><div class="stat-box-label">Лучший</div><div class="stat-box-value">${fmt(state.stats.bestRun)}</div></div><div class="stat-box"><div class="stat-box-label">Кликов</div><div class="stat-box-value">${fmt(state.stats.clicksTotal)}</div></div><div class="stat-box"><div class="stat-box-label">Руды</div><div class="stat-box-value">${fmt(state.stats.totalMined)}</div></div><div class="stat-box"><div class="stat-box-label">Боссов</div><div class="stat-box-value">${state.stats.bossKills}</div></div><div class="stat-box"><div class="stat-box-label">Комбо</div><div class="stat-box-value">${fmt(state.stats.totalCombo)}</div></div><div class="stat-box"><div class="stat-box-label">Ребёрнов</div><div class="stat-box-value">${state.rebirths}</div></div><div class="stat-box"><div class="stat-box-label">Макс очков</div><div class="stat-box-value">${state.stats.maxPoints}</div></div><div class="stat-box"><div class="stat-box-label">Макс денег</div><div class="stat-box-value">${fmt(state.stats.maxMoney)}</div></div><div class="stat-box"><div class="stat-box-label">В игре</div><div class="stat-box-value">${h}ч ${m}м</div></div>`;
+}
+
+function renderSettings() {
+  const now = Date.now();
+  const last = state.daily.lastClaimed || 0;
+  const ready = (now - last) >= DAILY_COOLDOWN;
+  const remaining = DAILY_COOLDOWN - (now - last);
+  const hoursLeft = Math.floor(remaining / 3600000);
+  const minsLeft = Math.floor((remaining % 3600000) / 60000);
+  const dailyBox = $('dailyBox'); if (dailyBox) dailyBox.classList.toggle('ready', ready);
+  const dailyStatus = $('dailyStatus');
+  const claimDailyBtn = $('claimDailyBtn');
+  if (ready) {
+    if (dailyStatus) dailyStatus.textContent = 'Готово!';
+    if (claimDailyBtn) { claimDailyBtn.disabled = false; claimDailyBtn.style.opacity = '1'; }
+  } else {
+    if (dailyStatus) dailyStatus.textContent = `Через ${hoursLeft}ч ${minsLeft}м`;
+    if (claimDailyBtn) { claimDailyBtn.disabled = true; claimDailyBtn.style.opacity = '0.5'; }
+  }
+  const grid = $('skinsGrid'); if (!grid) return;
+  grid.innerHTML = '';
+  for (const id in SKINS) {
+    const skin = SKINS[id];
+    const unlocked = state.unlockedSkins[id] || skin.unlocked;
+    const active = state.currentSkin === id;
+    const el = document.createElement('div');
+    el.className = 'skin-card' + (active ? ' active' : '') + (!unlocked ? ' locked' : '');
+    el.innerHTML = `<div class="skin-preview" style="background: linear-gradient(135deg, ${skin.bg[0]}, ${skin.bg[2]}); border: 2px solid ${skin.accent}"></div><div class="skin-name">${skin.name}</div><div class="skin-cost">${unlocked ? (active ? '✅ Активен' : 'Нажми') : skin.cost + ' 🌟'}</div>`;
+    el.addEventListener('click', () => {
+      if (!unlocked) {
+        if (state.prestigePoints < skin.cost) { showToast(`Не хватает ${skin.cost - state.prestigePoints} 🌟`, 'red', 1500); return; }
+        if (!confirm(`Купить скин «${skin.name}» за ${skin.cost} 🌟?`)) return;
+        state.prestigePoints -= skin.cost;
+        state.unlockedSkins[id] = true;
+        logEvent(`Куплен скин: ${skin.name}`);
+        playSound('buy');
+      }
+      state.currentSkin = id;
+      applySkin();
+      renderSettings();
+      updateUI();
+    });
+    grid.appendChild(el);
+  }
+}
+
+function claimDaily() {
+  const now = Date.now();
+  const last = state.daily.lastClaimed || 0;
+  if ((now - last) < DAILY_COOLDOWN) return;
+  const availableOres = ORE_TYPES.filter(o => state.unlockedCurrencies[o.id]);
+  const ore = availableOres[Math.floor(Math.random() * availableOres.length)];
+  const amount = Math.ceil(20 * Math.pow(1.5, ORE_TYPES.indexOf(ore)));
+  state.inventory[ore.id] = (state.inventory[ore.id] || 0) + amount;
+  state.daily.lastClaimed = now;
+  showToast(`🎁 +${amount} ${ore.icon} ${ore.name}!`, 'gold', 3500);
+  logEvent(`Ежедневка: +${amount} ${ore.name}`);
+  playSound('unlock');
+  renderSettings();
+  updateUI();
+}
+
+function applySkin() {
+  const skin = SKINS[state.currentSkin] || SKINS.classic;
+  const main = $('screenMain');
+  if (main) main.style.background = `radial-gradient(ellipse 80% 60% at 50% 0%, ${skin.accent}40, transparent 60%), radial-gradient(ellipse 100% 80% at 50% 100%, ${skin.bg[2]}, transparent 70%), linear-gradient(180deg, ${skin.bg[0]} 0%, ${skin.bg[1]} 40%, ${skin.bg[2]} 100%)`;
+  document.documentElement.style.setProperty('--gold-1', skin.accent);
+}
+
+// ============================================================
+// СОХРАНЕНИЕ
+// ============================================================
+function save(showToastMsg = false) {
+  try {
+    const data = { money: state.money, rebirths: state.rebirths, prestigePoints: state.prestigePoints, skills: state.skills, prestigeTree: state.prestigeTree, inventory: state.inventory, unlockedCurrencies: state.unlockedCurrencies, unlockedOres: state.unlockedOres, unlockedSkins: state.unlockedSkins, currentSkin: state.currentSkin, stats: state.stats, daily: state.daily, settings: state.settings, lastSave: Date.now() };
+    localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+    state.lastSave = Date.now();
+    if (showToastMsg) showToast('✅ Сессия сохранена', 'mint', 1500);
+    return true;
+  } catch (e) { if (showToastMsg) showToast('❌ Ошибка сохранения', 'red', 2000); return false; }
+}
+
+function load() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    Object.assign(state, data);
+    state.skills = data.skills || {};
+    state.prestigeTree = data.prestigeTree || {};
+    state.inventory = data.inventory || { copper: 0, silver: 0, gold: 0, diamond: 0, mithril: 0, plasma: 0 };
+    state.unlockedCurrencies = data.unlockedCurrencies || { copper: true };
+    state.unlockedOres = data.unlockedOres || { copper: true };
+    state.unlockedSkins = data.unlockedSkins || { classic: true };
+    state.stats = data.stats || state.stats;
+    state.daily = data.daily || { lastClaimed: 0 };
+    state.settings = data.settings || { soundOn: true };
+    const offlineMs = Date.now() - (data.lastSave || Date.now());
+    const offlineSec = Math.min(offlineMs / 1000, 8 * 3600);
+    if (offlineSec > 60) {
+      const offlineGain = Math.floor(offlineSec / 10);
+      if (offlineGain > 0 && state.unlockedCurrencies.copper) {
+        state.inventory.copper += offlineGain;
+        setTimeout(() => { showToast(`💤 Оффлайн: +${offlineGain} меди`, 'mint', 4000); logEvent(`Оффлайн-бонус: +${offlineGain} меди`); updateUI(); }, 600);
+      }
+    }
+    return true;
+  } catch (e) { return false; }
+}
+
+function resetGame() {
+  if (!confirm('🗑 Точно сбросить ВЕСЬ прогресс? Это необратимо!')) return;
+  localStorage.removeItem(SAVE_KEY);
+  localStorage.removeItem(LOGS_KEY);
+  location.reload();
+}
+
+// ============================================================
+// ИГРОВОЙ ЦИКЛ
+// ============================================================
+let lastTick = performance.now();
+let autoHitAccum = 0;
+
+function gameLoop(now) {
+  const dt = Math.min((now - lastTick) / 1000, 0.5);
+  lastTick = now;
+  if (state.run.active) {
+    const nowMs = Date.now();
+    if (nowMs >= state.run.endsAt) { endRun(false); }
+    else {
+      state.run.spawnAccum += dt;
+      const interval = getSpawnInterval();
+      while (state.run.spawnAccum >= interval) { state.run.spawnAccum -= interval; spawnOre(); }
+      if (!state.run.bossSpawned && nowMs >= state.run.bossAt && Math.random() < BOSS_CHANCE) { spawnBoss(); state.run.bossSpawned = true; }
+      const autoDmg = getAutoHit();
+      if (autoDmg > 0) {
+        autoHitAccum += dt;
+        if (autoHitAccum >= 1) {
+          autoHitAccum = 0;
+          for (const oreRef of state.run.fieldOres.slice()) {
+            if (oreRef.collected) continue;
+            oreRef.hp -= autoDmg;
+            updateOreHp(oreRef);
+            if (oreRef.hp <= 0) { oreRef.hp = 0; collectOre(oreRef, null, null); }
+          }
+        }
+      }
+      for (const oreRef of state.run.fieldOres) {
+        if (oreRef.collected || oreRef.behavior === 'static' || oreRef.isBoss) continue;
+        if (nowMs - oreRef.lastMove > 1500) {
+          oreRef.lastMove = nowMs;
+          const field = $('runField');
+          const rect = field.getBoundingClientRect();
+          const size = oreRef.el.offsetWidth;
+          const padding = size + 10;
+          let x = parseInt(oreRef.el.style.left);
+          let y = parseInt(oreRef.el.style.top);
+          if (oreRef.behavior === 'drift') { x += (Math.random() - 0.5) * 60; y += (Math.random() - 0.5) * 60; }
+          else if (oreRef.behavior === 'teleport') { x = padding + Math.random() * (rect.width - padding * 2); y = 100 + Math.random() * (rect.height - 200); }
+          else if (oreRef.behavior === 'fast') { x += (Math.random() - 0.5) * 120; y += (Math.random() - 0.5) * 120; }
+          else if (oreRef.behavior === 'dodge') { x += (Math.random() - 0.5) * 150; y += (Math.random() - 0.5) * 150; }
+          x = clamp(x, padding, rect.width - padding - size);
+          y = clamp(y, 100, rect.height - 120 - size);
+          oreRef.el.style.left = x + 'px';
+          oreRef.el.style.top = y + 'px';
+        }
+      }
+      for (let i = state.run.fieldOres.length - 1; i >= 0; i--) {
+        const oreRef = state.run.fieldOres[i];
+        if (oreRef.collected) continue;
+        if (nowMs >= oreRef.expiresAt) {
+          oreRef.el.style.transition = 'opacity 0.3s, transform 0.3s';
+          oreRef.el.style.opacity = '0';
+          oreRef.el.style.transform = 'scale(0.5)';
+          const el = oreRef.el;
+          setTimeout(() => el.remove(), 300);
+          state.run.fieldOres.splice(i, 1);
+          if (!oreRef.isBoss) state.run.combo = 0;
+        }
+      }
+      if (hasAutoCollect()) {
+        for (const oreRef of state.run.fieldOres.slice()) {
+          if (oreRef.collected) continue;
+          if (oreRef.expiresAt - nowMs < 300) collectOre(oreRef, null, null);
+        }
+      }
+      if (state.run.combo > 0 && nowMs - state.run.comboLastHit > 5000) { state.run.combo = 0; }
+      updateRunHud();
+    }
+  }
+  requestAnimationFrame(gameLoop);
+}
+
+// ============================================================
+// ОБРАБОТЧИКИ СОБЫТИЙ
+// ============================================================
+function setupUI() {
+  $('startBtn').addEventListener('click', () => { if (state.run.active) return; startRun(); });
+  $('skillsBtn').addEventListener('click', () => { renderSkillsTree(); openScreen('skillsScreen'); });
+  $('prestigeBtn').addEventListener('click', () => { renderPrestigeTree(); openScreen('prestigeScreen'); });
+  $('rebirthBtn').addEventListener('click', () => { updateRebirthInfo(); openScreen('rebirthScreen'); });
+  $('logsBtn').addEventListener('click', () => { renderLogs(); openModal('logsModal'); });
+  $('settingsBtn').addEventListener('click', () => { renderSettings(); openModal('settingsModal'); });
+  $('soundBtn').addEventListener('click', () => {
+    state.settings.soundOn = !state.settings.soundOn;
+    $('soundBtn').textContent = state.settings.soundOn ? '🔊' : '🔇';
+    if (state.settings.soundOn) playSound('buy');
+  });
+  $('statsBtn').addEventListener('click', () => { renderStats(); openModal('statsModal'); });
+  $('saveBtn').addEventListener('click', () => save(true));
+  $('logsClose').addEventListener('click', () => closeModal('logsModal'));
+  $('statsClose').addEventListener('click', () => closeModal('statsModal'));
+  $('settingsClose').addEventListener('click', () => closeModal('settingsModal'));
+  $('resetBtn').addEventListener('click', resetGame);
+  $('claimDailyBtn').addEventListener('click', claimDaily);
+  $('endRunBtn').addEventListener('click', () => endRun(true));
+  $('againBtn').addEventListener('click', () => { closeRunAndReturn(); setTimeout(startRun, 200); });
+  $('backToMenuBtn').addEventListener('click', closeRunAndReturn);
+  $('skillsBack').addEventListener('click', () => closeScreen('skillsScreen'));
+  $('prestigeBack').addEventListener('click', () => closeScreen('prestigeScreen'));
+  $('rebirthBack').addEventListener('click', closeRebirthScreen);
+  $('doRebirthBtn').addEventListener('click', doRebirth);
+  ['logsModal', 'statsModal', 'settingsModal'].forEach(id => {
+    $(id).addEventListener('click', e => { if (e.target.id === id) closeModal(id); });
+  });
+  document.addEventListener('keydown', e => {
+    if (e.code === 'Space' && !state.run.active) {
+      e.preventDefault();
+      if ($('screenMain').classList.contains('hidden')) return;
+      if (document.querySelector('.fullscreen-screen.active')) return;
+      if (document.querySelector('.modal.active')) return;
+      startRun();
+    }
+    if (e.code === 'Escape') { closeModal('logsModal'); closeModal('statsModal'); closeModal('settingsModal'); }
+  });
+  window.addEventListener('beforeunload', () => save(false));
+  document.addEventListener('visibilitychange', () => { if (document.hidden) save(false); });
+}
+
+// ============================================================
+// ИНИЦИАЛИЗАЦИЯ
+// ============================================================
+function init() {
+  loadLogs();
+  setInterval(spawnDust, 350);
+  for (let i = 0; i < 20; i++) setTimeout(spawnDust, i * 100);
+  load();
+  if (!state.skills) state.skills = {};
+  if (!state.prestigeTree) state.prestigeTree = {};
+  $('soundBtn').textContent = state.settings.soundOn ? '🔊' : '🔇';
+  applySkin();
+  setupUI();
+  refreshCurrenciesPanel();
+  renderUI();
+  logEvent('Игра запущена');
+  requestAnimationFrame(gameLoop);
+  setInterval(() => save(false), 5000);
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  }
+  let deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    const installBtn = document.createElement('button');
+    installBtn.textContent = '📱 Установить';
+    installBtn.className = 'icon-btn';
+    installBtn.style.cssText = 'position:fixed;bottom:80px;left:12px;z-index:100;width:auto;padding:0 14px;border-radius:12px;font-size:12px;gap:6px;display:flex;align-items:center';
+    installBtn.onclick = async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      installBtn.remove();
+    };
+    document.body.appendChild(installBtn);
+  });
+}
+
+init();
+
+// ============================================================
+// SPLASH SCREEN
+// ============================================================
+(function hideSplash() {
+  const splash = document.getElementById('splashScreen');
+  const progress = document.getElementById('splashProgress');
+  if (!splash) return;
+  let pct = 0;
+  const interval = setInterval(() => {
+    pct = Math.min(100, pct + Math.random() * 25);
+    if (progress) progress.style.width = pct + '%';
+    if (pct >= 100) clearInterval(interval);
+  }, 150);
+  setTimeout(() => {
+    splash.style.opacity = '0';
+    setTimeout(() => splash.remove(), 700);
+  }, 1200);
+})();
+</script>
+</body>
+</html>
