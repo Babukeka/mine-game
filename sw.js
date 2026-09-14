@@ -11,11 +11,9 @@ const CACHE_RUNTIME = CACHE_VERSION + '-runtime';
 const STATIC_ASSETS = [
   './',
   './mine.html',
-  './index.html',        // на случай если файл переименован
   './manifest.json',
   './icon-192.png',
   './icon-256.png',
-  './icon-384.png',
   './icon-512.png'
 ];
 
@@ -23,24 +21,19 @@ const STATIC_ASSETS = [
 // INSTALL — кэшируем все статические ресурсы
 // ============================================================
 self.addEventListener('install', (event) => {
-  console.log('[SW] Установка service worker');
+  console.log('[SW] Установка');
   event.waitUntil(
     caches.open(CACHE_STATIC)
       .then(cache => {
-        console.log('[SW] Кэширую статические ресурсы');
-        // Пытаемся закэшировать всё, игнорируем ошибки для отдельных файлов
         return Promise.all(
           STATIC_ASSETS.map(url =>
             cache.add(url).catch(err => {
-              console.warn('[SW] Не удалось закэшировать:', url, err);
+              console.warn('[SW] Не удалось закэшировать:', url);
             })
           )
         );
       })
-      .then(() => {
-        console.log('[SW] Установка завершена');
-        return self.skipWaiting(); // активируем сразу
-      })
+      .then(() => self.skipWaiting())
   );
 });
 
@@ -51,20 +44,12 @@ self.addEventListener('activate', (event) => {
   console.log('[SW] Активация');
   event.waitUntil(
     caches.keys()
-      .then(cacheNames => {
-        return Promise.all(
-          cacheNames
-            .filter(name => name.startsWith('mine2026-') && name !== CACHE_STATIC && name !== CACHE_RUNTIME)
-            .map(name => {
-              console.log('[SW] Удаляю старый кэш:', name);
-              return caches.delete(name);
-            })
-        );
-      })
-      .then(() => {
-        console.log('[SW] Активация завершена');
-        return self.clients.claim(); // берём контроль над всеми вкладками
-      })
+      .then(cacheNames => Promise.all(
+        cacheNames
+          .filter(name => name.startsWith('mine2026-') && name !== CACHE_STATIC && name !== CACHE_RUNTIME)
+          .map(name => caches.delete(name))
+      ))
+      .then(() => self.clients.claim())
   );
 });
 
@@ -75,35 +60,25 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Игнорируем не-GET запросы
   if (request.method !== 'GET') return;
-
-  // Игнорируем chrome-extension и другие не HTTP схемы
   if (!url.protocol.startsWith('http')) return;
 
-  // Игнорируем Google Fonts CDN (пусть грузятся из сети, а потом кэшируются)
-  // (мы их всё равно кэшируем ниже через runtime)
-
-  // Стратегия: Cache First для HTML и своих ресурсов
+  // Свои ресурсы — Cache First
   if (url.origin === self.location.origin) {
     event.respondWith(
       caches.match(request)
         .then(cached => {
           if (cached) {
-            // Есть в кэше — отдаём сразу, параллельно обновляем в фоне
-            fetch(request)
-              .then(response => {
-                if (response && response.status === 200) {
-                  caches.open(CACHE_STATIC).then(cache => {
-                    cache.put(request, response.clone());
-                  });
-                }
-              })
-              .catch(() => {}); // игнорируем ошибки сети
+            fetch(request).then(response => {
+              if (response && response.status === 200) {
+                caches.open(CACHE_STATIC).then(cache => {
+                  cache.put(request, response.clone());
+                });
+              }
+            }).catch(() => {});
             return cached;
           }
 
-          // Нет в кэше — грузим из сети и кэшируем
           return fetch(request)
             .then(response => {
               if (!response || response.status !== 200 || response.type !== 'basic') {
@@ -116,11 +91,8 @@ self.addEventListener('fetch', (event) => {
               return response;
             })
             .catch(() => {
-              // Сеть недоступна и нет в кэше
               if (request.destination === 'document') {
-                // Для HTML — отдаём сохранённый index/mine
-                return caches.match('./mine.html')
-                  .then(r => r || caches.match('./index.html'));
+                return caches.match('./mine.html');
               }
               return new Response('Офлайн', { status: 503 });
             });
@@ -129,47 +101,28 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Для сторонних ресурсов (Google Fonts и т.п.) — Cache First с runtime-кэшем
+  // Внешние ресурсы (шрифты Google) — Cache First с runtime
   event.respondWith(
     caches.match(request)
       .then(cached => {
         if (cached) return cached;
-
         return fetch(request)
           .then(response => {
             if (!response || response.status !== 200) return response;
-
             const responseClone = response.clone();
             caches.open(CACHE_RUNTIME).then(cache => {
               cache.put(request, responseClone);
             });
             return response;
           })
-          .catch(() => {
-            // Офлайн и не в кэше — ничего не отдаём
-            return new Response('', { status: 503 });
-          });
+          .catch(() => new Response('', { status: 503 }));
       })
   );
 });
 
-// ============================================================
-// MESSAGE — обмен с основной страницей
-// ============================================================
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
-  }
-  if (event.data && event.data.type === 'CACHE_URLS') {
-    // Принудительно кэшируем список URL
-    const urls = event.data.urls || [];
-    event.waitUntil(
-      caches.open(CACHE_STATIC).then(cache => {
-        return Promise.all(
-          urls.map(url => cache.add(url).catch(() => {}))
-        );
-      })
-    );
   }
 });
 
