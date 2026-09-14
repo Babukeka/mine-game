@@ -6,14 +6,13 @@
   "start_url": "./mine.html",
   "scope": "./",
   "display": "fullscreen",
-  "display_override": ["fullscreen", "standalone", "minimal-ui"],
+  "display_override": ["fullscreen", "standalone"],
   "orientation": "any",
   "background_color": "#1a0e00",
   "theme_color": "#1a0e00",
   "lang": "ru",
   "dir": "ltr",
   "categories": ["games", "entertainment"],
-  "prefer_related_applications": false,
   "icons": [
     {
       "src": "./icon-192.png",
@@ -28,39 +27,10 @@
       "purpose": "any"
     },
     {
-      "src": "./icon-384.png",
-      "sizes": "384x384",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
       "src": "./icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "./screenshot-1.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Главный экран игры"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Начать забег",
-      "short_name": "Забег",
-      "description": "Сразу начать забег в шахте",
-      "url": "./mine.html?action=run",
-      "icons": [
-        {
-          "src": "./icon-192.png",
-          "sizes": "192x192"
-        }
-      ]
     }
   ]
 }
